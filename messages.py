@@ -3,6 +3,7 @@ This file declares all message id's and formats. Most of these are simply hand c
 """
 import enum
 import struct
+import collections
 
 @enum.unique
 class msg_id(enum.Enum):
@@ -70,7 +71,16 @@ msg_fmt = {
     msg_id.alive : '',
 }
 
-def generate_payload(message_id, *args):
-    return struct.pack('<B' + msg_fmt[msg_id], message_id, *args)
+
+msg = collections.namedtuple('msg', 'id vargs_tuple')
+
+
+def generate_payload(message):
+    """
+    Converts a message to a byte string.
+    :param message: The message to be written.
+    :return: byte string
+    """
+    return struct.pack('<B' + msg_fmt[message.id], message.id, *message.vargs_tuple)
 
 

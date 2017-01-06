@@ -1,8 +1,8 @@
 import collections
 import struct
-import copy
 from PyCRC.CRC16 import CRC16
-from exceptions import *
+from .exceptions import *
+
 
 class Header(collections.namedtuple('Header', ['payload_index', 'payload_length'])):
     """
@@ -263,29 +263,6 @@ class Stateless(UnpackerBase, PackerBase):
 
     @staticmethod
     def pack(payload):
-        """
-        See PackerBase.pack
-        """
-        return Stateless._pack(payload)
-
-
-class Stated(UnpackerBase, PackerBase):
-    """
-    Stated packing and unpacking of VESC packets
-    """
-    def __init__(self):
-        self.header = None
-
-    def unpack(self, buffer, errors='ignore'):
-        """
-        Attempt to parse a packet from the buffer.
-        :param buffer: buffer object
-        :param errors: specifies error handling scheme. see codec error handling schemes
-        :return: (1) Packet if parse was successful, None otherwise, (2) Length consumed of buffer
-        """
-        return Stated._unpack(buffer, self.header, errors)
-
-    def pack(self, payload):
         """
         See PackerBase.pack
         """
