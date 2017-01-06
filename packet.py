@@ -226,8 +226,11 @@ class UnpackerBase(object):
                     raise corrupt_packet
 
 class PackerBase(object):
+    """
+    Packing is the same for stated and stateless. Therefore its implemented in this base class.
+    """
     @staticmethod
-    def pack(payload):
+    def _pack(payload):
         """
         Packs a payload.
         :param payload: byte string of payload
@@ -245,6 +248,9 @@ class PackerBase(object):
 
 
 class Stateless(UnpackerBase, PackerBase):
+    """
+    Statelessly pack and unpack VESC packets.
+    """
     @staticmethod
     def unpack(buffer, errors='ignore'):
         """
@@ -260,10 +266,13 @@ class Stateless(UnpackerBase, PackerBase):
         """
         See PackerBase.pack
         """
-        return Stateless.pack(payload)
+        return Stateless._pack(payload)
 
 
 class Stated(UnpackerBase, PackerBase):
+    """
+    Stated packing and unpacking of VESC packets
+    """
     def __init__(self):
         self.header = None
 
@@ -280,5 +289,5 @@ class Stated(UnpackerBase, PackerBase):
         """
         See PackerBase.pack
         """
-        return Stateless.pack(payload)
+        return Stateless._pack(payload)
 
