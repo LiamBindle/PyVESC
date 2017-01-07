@@ -6,7 +6,9 @@ class MsgRegistry(type):
 
     def __init__(cls, name, bases, clsdict):
         if len(cls.mro()) > 2:
+            # cls is subclass of Msg
             if clsdict['id'] in MsgRegistry._registry:
+                # msg with ID is already in the registry
                 raise DuplicateMessageID
             else:
                 MsgRegistry._registry[clsdict['id']] = cls
@@ -15,6 +17,10 @@ class MsgRegistry(type):
     @staticmethod
     def find(id):
         return MsgRegistry._registry[id]
+
+    @staticmethod
+    def reinitialized():
+        raise NotImplementedError
 
 class Msg(metaclass=MsgRegistry):
     endian_fmt = '<'

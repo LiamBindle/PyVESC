@@ -20,12 +20,13 @@ def decode(buffer, errors='ignore'):
     :param errors: Error handling scheme. See codec error handling schemes.
     :return: The VESC message
     """
-    return Msg.unpack(Stateless.unpack(buffer, errors))
+    payload, consumed = Stateless.unpack(buffer, errors)
+    return Msg.unpack(payload), consumed
 
-vesc_codec = codecs.CodecInfo(encode, decode, None, None, None, None, 'vesc-msgs')
+vesc_codec = codecs.CodecInfo(encode, decode, None, None, None, None, 'vesc-msg')
 
 def vesc_search_function(name_lower):
-    if name_lower is 'vesc-msgs':
+    if name_lower is 'vesc-msg':
         return vesc_codec
     else:
         return None
