@@ -1,7 +1,7 @@
 import collections
 import struct
 from PyCRC.CRC16 import CRC16
-from .exceptions import *
+from exceptions import *
 
 
 class Header(collections.namedtuple('Header', ['payload_index', 'payload_length'])):
@@ -120,8 +120,8 @@ class UnpackerBase(object):
         """
         if len(buffer) < 2: # too short to find next
             return -1
-        next_short_sb = buffer[1:].find('\x02')
-        next_long_sb= buffer[1:].find('\x03')
+        next_short_sb = buffer[1:].find(b'\x02')
+        next_long_sb= buffer[1:].find(b'\x03')
         possible_index = []
         if next_short_sb >= 0: # exclude index zero's as we know the current first packet is corrupt
             possible_index.append(next_short_sb + 1) # +1 because we want found from second byte
@@ -146,6 +146,10 @@ class UnpackerBase(object):
             return next_index # consume up to next index
 
     @staticmethod
+    def _packet_size(header):
+        return struct.calcsize(Header.fmt(header.payload_index)) + header.payload_length + struct.calcsize(Footer.fmt())
+
+    @staticmethod
     def _packet_parsable(buffer, header):
         """
         Checks if an entire packet is parsable.
@@ -153,8 +157,7 @@ class UnpackerBase(object):
         :param header: Header object
         :return: True if the current packet is parsable, False otherwise.
         """
-        frame_size = struct.calcsize(Header.fmt(header.payload_index)) + header.payload_length + struct.calcsize(
-            Footer.fmt())
+        frame_size = UnpackerBase._packet_size(header)
         return len(buffer) >= frame_size
 
     @staticmethod
@@ -184,7 +187,7 @@ class UnpackerBase(object):
         return
 
     @staticmethod
-    def _unpack(buffer, header, errors):
+    def _unpack(buffer, header, errors, recovery_mode=False):
         """
         Attempt to parse a packet from the buffer.
         :param buffer: buffer object
@@ -209,8 +212,9 @@ class UnpackerBase(object):
                 # validate the payload
                 UnpackerBase._validate_payload(payload, footer)
                 # clean header as we wont need it again
+                consumed = UnpackerBase._packet_size(header)
                 header = None
-                return payload, len(payload)
+                return payload, consumed
             except CorruptPacket as corrupt_packet:
                 if errors is 'ignore':
                     # find the next possible start byte in the buffer
@@ -219,8 +223,8 @@ class UnpackerBase(object):
                     if next_sb == -1: # no valid start byte in buffer. consume entire buffer
                         return None, len(buffer)
                     else:
-                        # try to unpack next packet recursively
-                        payload, consumed = UnpackerBase._unpack(buffer[next_sb:], header, errors)
+                        # try to unpack next packet recursively, TODO: if we return with not enough in buffer, try next possible ( to avoid needing to wait for a huge number of bytes)
+                        payload, consumed = UnpackerBase._unpack(buffer[next_sb:], header, errors, True)
                         return payload, consumed + next_sb
                 elif errors is 'strict':
                     raise corrupt_packet
