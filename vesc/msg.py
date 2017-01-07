@@ -1,5 +1,5 @@
 import struct
-from exceptions import *
+from .exceptions import *
 
 class MsgRegistry(type):
     _registry = {}

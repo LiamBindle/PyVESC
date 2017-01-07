@@ -1,7 +1,7 @@
 import collections
 import struct
 from PyCRC.CRC16 import CRC16
-from exceptions import *
+from .exceptions import *
 
 
 class Header(collections.namedtuple('Header', ['payload_index', 'payload_length'])):
@@ -294,4 +294,3 @@ class Stateless(UnpackerBase, PackerBase):
         See PackerBase.pack
         """
         return Stateless._pack(payload)
-

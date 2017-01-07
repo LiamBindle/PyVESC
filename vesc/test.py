@@ -9,7 +9,7 @@ class TestPacket(TestCase):
         :param length: Number of bytes in payload.
         """
         import random
-        from packet import Stateless
+        from .packet import Stateless
         correct_payload_index = None
         if length < 256:
             correct_payload_index = 2
@@ -34,7 +34,7 @@ class TestPacket(TestCase):
         :param length2: Length of second payload
         """
         import random
-        from packet import Stateless
+        from .packet import Stateless
         correct_payload_index1 = None
         correct_payload_index2 = None
         if length1 < 256:
@@ -65,7 +65,7 @@ class TestPacket(TestCase):
 
     def parse_buffer(self, length):
         import random
-        from packet import Stateless
+        from .packet import Stateless
         correct_payload_index = None
         if length < 256:
             correct_payload_index = 2
@@ -119,7 +119,7 @@ class TestPacket(TestCase):
     def test_corrupt_detection(self):
         import random
         import struct
-        from packet import Stateless
+        from .packet import Stateless
         # make a good packet
         test_payload = b'Te!'
         good_packet = b'\x02\x03Te!\xaa\x98\x03'
@@ -163,7 +163,7 @@ class TestPacket(TestCase):
     def test_corrupt_recovery(self):
         import random
         import struct
-        from packet import Stateless
+        from .packet import Stateless
         # make a good packet
         test_payload = b'Te!'
         good_packet = b'\x02\x03Te!\xaa\x98\x03'
@@ -208,7 +208,7 @@ class TestPacket(TestCase):
 
 class TestMsg(TestCase):
     def verify_packing_and_unpacking(self, msg):
-        from msg import Msg
+        from .msg import Msg
         payload_bytes = msg.pack()
         parsed_msg = Msg.unpack(payload_bytes)
         self.assertEqual(parsed_msg.id, msg.id)
@@ -216,7 +216,7 @@ class TestMsg(TestCase):
             self.assertEqual(getattr(parsed_msg, name), getattr(msg, name))
 
     def test_single_message(self):
-        from msg import Msg
+        from .msg import Msg
         class testMsg1(Msg):
             id = 0x12
             fields = [
@@ -232,7 +232,7 @@ class TestMsg(TestCase):
         self.verify_packing_and_unpacking(test_message)
 
     def test_multiple_messages(self):
-        from msg import Msg
+        from .msg import Msg
 
         class testMsg1(Msg):
             id = 0x15
@@ -267,8 +267,8 @@ class TestMsg(TestCase):
         self.verify_packing_and_unpacking(test_message3)
 
     def test_errors(self):
-        from msg import Msg
-        from exceptions import DuplicateMessageID
+        from .msg import Msg
+        from .exceptions import DuplicateMessageID
 
         # try to make two messages with the same ID
         class testMsg1(Msg):
@@ -302,5 +302,3 @@ class TestMsg(TestCase):
 
 class TestCodec(TestCase):
     pass
-
-

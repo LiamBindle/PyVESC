@@ -31,6 +31,3 @@ def vesc_search_function(name_lower):
         return None
 
 codecs.register(vesc_search_function)
-
-
-
