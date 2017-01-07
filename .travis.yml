@@ -1,0 +1,8 @@
+language: python
+python:
+  - "3.5"
+cache: pip
+install:
+  - pip install -r requirements.txt
+script:
+  - python unittest.py vesc/tests.py
