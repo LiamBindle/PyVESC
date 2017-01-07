@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+
 class TestPacket(TestCase):
     def exact_single_frame(self, length):
         """
@@ -102,7 +103,7 @@ class TestPacket(TestCase):
             self.exact_single_frame(length)
             self.exact_two_frames(length, length + 2)
             self.parse_buffer(length)
-    
+
     def test_med_packets(self):
         for length in range(254, 258):
             self.exact_single_frame(length)
@@ -206,7 +207,99 @@ class TestPacket(TestCase):
         self.assertEqual(out_buffer, b'')
 
 class TestMsg(TestCase):
-    pass
+    def verify_packing_and_unpacking(self, msg):
+        from msg import Msg
+        payload_bytes = msg.pack()
+        parsed_msg = Msg.unpack(payload_bytes)
+        self.assertEqual(parsed_msg.id, msg.id)
+        for name in [names[0] for names in msg.fields]:
+            self.assertEqual(getattr(parsed_msg, name), getattr(msg, name))
+
+    def test_single_message(self):
+        from msg import Msg
+        class testMsg1(Msg):
+            id = 0x12
+            fields = [
+                ('f1', 'B'),
+                ('f2', 'H'),
+                ('f3', 'i'),
+                ('f4', 'L'),
+                ('f5', 'b'),
+                ('f6', 'I'),
+            ]
+
+        test_message = testMsg1(27, 25367, -1124192846, 2244862237, 17, 73262)
+        self.verify_packing_and_unpacking(test_message)
+
+    def test_multiple_messages(self):
+        from msg import Msg
+
+        class testMsg1(Msg):
+            id = 0x15
+            fields = [
+                ('f1', 'B'),
+                ('f2', 'H'),
+                ('f3', 'i'),
+                ('f4', 'L'),
+                ('f5', 'b'),
+                ('f6', 'I'),
+            ]
+
+        class testMsg2(Msg):
+            id = 0x19
+            fields = [
+                ('f1', 'B'),
+                ('f2', 'B'),
+            ]
+
+        class testMsg3(Msg):
+            id = 0x11
+            fields = [
+                ('f1', 'i'),
+                ('f2', 'i'),
+            ]
+
+        test_message1 = testMsg1(27, 25367, -1124192846, 2244862237, 17, 73262)
+        test_message2 = testMsg2(27, 13)
+        test_message3 = testMsg3(-7841, 4611)
+        self.verify_packing_and_unpacking(test_message1)
+        self.verify_packing_and_unpacking(test_message2)
+        self.verify_packing_and_unpacking(test_message3)
+
+    def test_errors(self):
+        from msg import Msg
+        from exceptions import DuplicateMessageID
+        from exceptions import NoMessageID
+
+        # try to make two messages with the same ID
+        class testMsg1(Msg):
+            id = 0x01
+            fields = [
+                ('f1', 'H'),
+                ('f2', 'H'),
+            ]
+        caught = False
+        try:
+            class testMsg2(Msg):
+                id = 0x01
+                fields = [
+                    ('f1', 'B'),
+                    ('f2', 'B'),
+                ]
+        except DuplicateMessageID as e:
+            caught = True
+        self.assertTrue(caught)
+
+        # try to fill a message with the wrong number of arguments
+        caught = False
+        try:
+            testmessage1 = testMsg1(2, 4, 5) # should be 2 args
+        except AttributeError as e:
+            caught = True
+        self.assertTrue(caught)
+
+
+
 
 class TestCodec(TestCase):
     pass

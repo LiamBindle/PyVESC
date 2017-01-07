@@ -6,8 +6,10 @@ class MsgRegistry(type):
 
     def __init__(cls, name, bases, clsdict):
         if len(cls.mro()) > 2:
-            MsgRegistry._registry[clsdict['id']] = cls
-            print("added subclass to registry")
+            if clsdict['id'] in MsgRegistry._registry:
+                raise DuplicateMessageID
+            else:
+                MsgRegistry._registry[clsdict['id']] = cls
         super(MsgRegistry, cls).__init__(name, bases, clsdict)
 
     @staticmethod
@@ -34,7 +36,7 @@ class Msg(metaclass=MsgRegistry):
             self._fmt_fields += field[1]
         if args:
             if len(args) != len(self.fields):
-                raise Exception("Expected %u arguments, received %u" % (len(self.fields), len(args)))
+                raise AttributeError("Expected %u arguments, received %u" % (len(self.fields), len(args)))
             for name, value in zip(self._field_names, args):
                 setattr(self, name, value)
 
@@ -56,22 +58,3 @@ class Msg(metaclass=MsgRegistry):
         data = struct.unpack_from(Msg.endian_fmt + Msg.fmt(msg_t), bytestring, 1)
         msg = msg_t(*data)
         return msg
-
-class example_msg(Msg):
-    id = 0x34
-    fields = [
-        ('pwm', 'H'),
-        ('fwd', 'B')
-    ]
-
-if __name__ == "__main__":
-    print("hi")
-    p1 = example_msg()
-    p1.pwm = 54
-    p1.fwd = 12
-
-    p2 = Msg.unpack(p1.pack())
-
-
-
-
