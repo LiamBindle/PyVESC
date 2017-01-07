@@ -1,5 +1,5 @@
-from .messages import generate_payload
 from .packet import Stateless
+from .msg import Msg
 import codecs
 
 
@@ -10,7 +10,7 @@ def encode(vesc_msg, errors='ignore'):
     :param errors: Error handling scheme. See codec error handling schemes.
     :return: data packet as a byte string
     """
-    return Stateless.pack(generate_payload(vesc_msg), errors)
+    return Stateless.pack(vesc_msg.pack(), errors)
 
 
 def decode(buffer, errors='ignore'):
@@ -18,9 +18,9 @@ def decode(buffer, errors='ignore'):
     Decodes a VESC message from a buffer.
     :param buffer: Buffer object.
     :param errors: Error handling scheme. See codec error handling schemes.
-    :return: VESC message
+    :return: The VESC message
     """
-    return Stateless.unpack(buffer, errors)
+    return Msg.unpack(Stateless.unpack(buffer, errors))
 
 vesc_codec = codecs.CodecInfo(encode, decode, None, None, None, None, 'vesc-msgs')
 
