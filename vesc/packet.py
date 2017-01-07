@@ -201,11 +201,17 @@ class UnpackerBase(object):
                     header = UnpackerBase._unpack_header(buffer)
                 if header is None:
                     # buffer is too short to parse a header
-                    return None, 0
+                    if recovery_mode:
+                        return Stateless._recovery_recurse(buffer, header, errors, False)
+                    else:
+                        return None, 0
                 # check if a packet is parsable
                 if UnpackerBase._packet_parsable(buffer, header) is False:
                     # buffer is too short to parse the rest of the packet
-                    return None, 0
+                    if recovery_mode:
+                        return Stateless._recovery_recurse(buffer, header, errors, False)
+                    else:
+                        return None, 0
                 # parse the packet
                 payload = UnpackerBase._unpack_payload(buffer, header)
                 footer = UnpackerBase._unpack_footer(buffer, header)
@@ -218,16 +224,33 @@ class UnpackerBase(object):
             except CorruptPacket as corrupt_packet:
                 if errors is 'ignore':
                     # find the next possible start byte in the buffer
-                    header = None # clean header
-                    next_sb = UnpackerBase._next_possible_packet_index(buffer)
-                    if next_sb == -1: # no valid start byte in buffer. consume entire buffer
-                        return None, len(buffer)
-                    else:
-                        # try to unpack next packet recursively, TODO: if we return with not enough in buffer, try next possible ( to avoid needing to wait for a huge number of bytes)
-                        payload, consumed = UnpackerBase._unpack(buffer[next_sb:], header, errors, True)
-                        return payload, consumed + next_sb
+                    return Stateless._recovery_recurse(buffer, header, errors, True)
                 elif errors is 'strict':
                     raise corrupt_packet
+
+    @staticmethod
+    def _recovery_recurse(buffer, header, errors, consume_on_not_recovered):
+        header = None  # clean header
+        next_sb = UnpackerBase._next_possible_packet_index(buffer)
+        if next_sb == -1:  # no valid start byte in buffer. consume entire buffer
+            if consume_on_not_recovered:
+                return None, len(buffer)
+            else:
+                return None, 0
+        else:
+            # try to unpack next packet recursively, TODO: if we return with not enough in buffer, try next possible ( to avoid needing to wait for a huge number of bytes)
+            payload, consumed = UnpackerBase._unpack(buffer[next_sb:], header, errors, True)
+            if payload is None:
+                # failed to recover
+                if consume_on_not_recovered:
+                    return payload, consumed + next_sb
+                else:
+                    return payload, consumed
+            else:
+                # recovery was successful
+                return payload, consumed + next_sb
+
+
 
 class PackerBase(object):
     """

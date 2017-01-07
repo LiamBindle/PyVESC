@@ -114,7 +114,7 @@ class TestPacket(TestCase):
             self.exact_single_frame(length)
             self.exact_two_frames(length, length + 100)
             self.parse_buffer(length)
-
+    """
     def test_corrupt_packet_exactly_1_packet(self):
         import random
         import struct
@@ -149,10 +149,56 @@ class TestPacket(TestCase):
             parsed, consumed = Stateless.unpack(in_buffer)
             out_buffer = in_buffer[consumed:]
             self.assertEqual(parsed, None)
-            self.assertEqual(out_buffer, corrupt)
+            self.assertTrue(consumed > 0)   # if a packet is corrupt then at least something should be consumed
+            # get correct out_cuffer (in all of these cases it is just consuming to the next valid start byte (no more no less)
+            self.assertEqual(consumed, Stateless._next_possible_packet_index(in_buffer))
         # check that the good packet is parsed
         in_buffer = bytearray(good_packet)
-        parsed, consumed = parse(in_buffer)
+        parsed, consumed = Stateless.unpack(in_buffer)
+        out_buffer = in_buffer[consumed:]
+        self.assertEqual(parsed, test_payload)
+        self.assertEqual(out_buffer, b'')
+"""
+    def test_corrupt_packet_followed_by_good_packet(self):
+        import random
+        import struct
+        from packet import Stateless
+        # make a good packet
+        test_payload = b'Te!'
+        good_packet = b'\x02\x03Te!\xaa\x98\x03'
+        corrupt_packets = []
+        # corrupt first byte
+        corrupt = b'\x01\x03Te!\xaa\x98\x03'
+        corrupt_packets.append(corrupt)
+        # corrupt payload_length (to be smaller and larger)
+        smaller_corrupt = b'\x02\x02Te!\xaa\x98\x03'
+        larger_corrupt = b'\x02\x04Te!\xaa\x98\x03\x03'
+        corrupt_packets.append(smaller_corrupt)
+        corrupt_packets.append(larger_corrupt)
+        # corrupt first byte in payload
+        corrupt = b'\x02\x03se!\xaa\x98\x03'
+        corrupt_packets.append(corrupt)
+        # corrupt last byte in payload
+        corrupt = b'\x02\x03Tey\xaa\x98\x03'
+        corrupt_packets.append(corrupt)
+        # corrupt crc
+        corrupt = b'\x02\x03Te!\xaa\x91\x03'
+        corrupt_packets.append(corrupt)
+        # corrupt terminator
+        corrupt = b'\x02\x03Te!\xaa\x98\x09'
+        corrupt_packets.append(corrupt)
+        # check that exceptions are given on each corrupt packet
+        for corrupt in corrupt_packets:
+            in_buffer = bytearray(corrupt)
+            parsed, consumed = Stateless.unpack(in_buffer)
+            out_buffer = in_buffer[consumed:]
+            self.assertEqual(parsed, None)
+            self.assertTrue(consumed > 0)  # if a packet is corrupt then at least something should be consumed
+            # get correct out_cuffer (in all of these cases it is just consuming to the next valid start byte (no more no less)
+            self.assertEqual(consumed, Stateless._next_possible_packet_index(in_buffer))
+        # check that the good packet is parsed
+        in_buffer = bytearray(good_packet)
+        parsed, consumed = Stateless.unpack(in_buffer)
         out_buffer = in_buffer[consumed:]
         self.assertEqual(parsed, test_payload)
         self.assertEqual(out_buffer, b'')
