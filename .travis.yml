@@ -5,4 +5,4 @@ cache: pip
 install:
   - pip install -r requirements.txt
 script:
-  - python unittest.py vesc/tests.py
+  - python -m unittest vesc/tests.py
