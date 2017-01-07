@@ -269,7 +269,6 @@ class TestMsg(TestCase):
     def test_errors(self):
         from msg import Msg
         from exceptions import DuplicateMessageID
-        from exceptions import NoMessageID
 
         # try to make two messages with the same ID
         class testMsg1(Msg):
