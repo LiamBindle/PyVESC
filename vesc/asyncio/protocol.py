@@ -29,4 +29,4 @@ class VESCProtocol(asyncio.Protocol):
             msg_bytes, consumed = decode_packet(self.buffer)
             self.buffer = self.buffer[consumed:]
             if msg_bytes:
-                self.recv_callback(VESCMessage.decode(msg_bytes))
+                self.recv_callback(self, VESCMessage.decode(msg_bytes))

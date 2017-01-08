@@ -320,7 +320,5 @@ class TestMsg(TestCase):
         self.assertTrue(caught)
 
 
-
-
-class TestCodec(TestCase):
+class TestAIOProtocol(TestCase):
     pass
