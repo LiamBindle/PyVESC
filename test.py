@@ -9,7 +9,7 @@ class TestPacket(TestCase):
         :param length: Number of bytes in payload.
         """
         import random
-        from vesc.packet import Stateless
+        import vesc.packet.codec as vesc_packet
         correct_payload_index = None
         if length < 256:
             correct_payload_index = 2
@@ -17,11 +17,11 @@ class TestPacket(TestCase):
             correct_payload_index = 3
         test_payload = bytes(random.getrandbits(8) for i in range(length))
         # test framing
-        packet = Stateless.pack(test_payload)
+        packet = vesc_packet.encode(test_payload)
         self.assertEqual(len(packet), correct_payload_index + length + 3, "size of packet")
         buffer = bytearray(packet)
         # test Parser
-        parsed, consumed = Stateless.unpack(buffer)
+        parsed, consumed = vesc_packet.decode(buffer)
         buffer = buffer[consumed:]
         self.assertEqual(parsed, test_payload)
         self.assertEqual(len(buffer), 0)
@@ -34,7 +34,7 @@ class TestPacket(TestCase):
         :param length2: Length of second payload
         """
         import random
-        from vesc.packet import Stateless
+        import vesc.packet.codec as vesc_packet
         correct_payload_index1 = None
         correct_payload_index2 = None
         if length1 < 256:
@@ -48,43 +48,43 @@ class TestPacket(TestCase):
         test_payload1 = bytes(random.getrandbits(8) for i in range(length1))
         test_payload2 = bytes(random.getrandbits(8) for i in range(length2))
         # test framing
-        packet1 = Stateless.pack(test_payload1)
-        packet2 = Stateless.pack(test_payload2)
+        packet1 = vesc_packet.encode(test_payload1)
+        packet2 = vesc_packet.encode(test_payload2)
         self.assertEqual(len(packet1), correct_payload_index1 + length1 + 3, "size of packet")
         self.assertEqual(len(packet2), correct_payload_index2 + length2 + 3, "size of packet")
         buffer = bytearray(packet1 + packet2)
         # test Parser
-        parsed, consumed = Stateless.unpack(buffer)
+        parsed, consumed = vesc_packet.decode(buffer)
         buffer = buffer[consumed:]
         self.assertEqual(parsed, test_payload1)
         self.assertEqual(len(buffer), len(packet2))
-        parsed, consumed = Stateless.unpack(buffer)
+        parsed, consumed = vesc_packet.decode(buffer)
         buffer = buffer[consumed:]
         self.assertEqual(parsed, test_payload2)
         self.assertEqual(len(buffer), 0)
 
     def parse_buffer(self, length):
         import random
-        from vesc.packet import Stateless
+        import vesc.packet.codec as vesc_packet
         correct_payload_index = None
         if length < 256:
             correct_payload_index = 2
         else:
             correct_payload_index = 3
         test_payload = bytes(random.getrandbits(8) for i in range(length))
-        packet = Stateless.pack(test_payload)
+        packet = vesc_packet.encode(test_payload)
 
         # test on small buffers
         for n in range(0, 5):
             in_buffer = bytearray(packet[:n])
-            parsed, consumed = Stateless.unpack(in_buffer)
+            parsed, consumed = vesc_packet.decode(in_buffer)
             out_buffer = in_buffer[consumed:]
             self.assertEqual(parsed, None)
             self.assertEqual(in_buffer, out_buffer)
         # test on buffer almost big enough
         for n in range(len(packet) - 4, len(packet)):
             in_buffer = bytearray(packet[:n])
-            parsed, consumed = Stateless.unpack(in_buffer)
+            parsed, consumed = vesc_packet.decode(in_buffer)
             out_buffer = in_buffer[consumed:]
             self.assertEqual(parsed, None)
             self.assertEqual(in_buffer, out_buffer)
@@ -93,7 +93,7 @@ class TestPacket(TestCase):
         extended_packet = packet + b'\x02\x04\x07'
         for n in range(len(packet) + 1, len(packet) + 4):
             in_buffer = bytearray(extended_packet[:n])
-            parsed, consumed = Stateless.unpack(in_buffer)
+            parsed, consumed = vesc_packet.decode(in_buffer)
             out_buffer = in_buffer[consumed:]
             self.assertEqual(parsed, test_payload)
             self.assertEqual(out_buffer, extension[:n - len(packet)])
@@ -117,9 +117,7 @@ class TestPacket(TestCase):
             self.parse_buffer(length)
 
     def test_corrupt_detection(self):
-        import random
-        import struct
-        from vesc.packet import Stateless
+        import vesc.packet.codec as vesc_packet
         # make a good packet
         test_payload = b'Te!'
         good_packet = b'\x02\x03Te!\xaa\x98\x03'
@@ -147,23 +145,21 @@ class TestPacket(TestCase):
         # check that exceptions are given on each corrupt packet
         for corrupt in corrupt_packets:
             in_buffer = bytearray(corrupt)
-            parsed, consumed = Stateless.unpack(in_buffer)
+            parsed, consumed = vesc_packet.decode(in_buffer)
             out_buffer = in_buffer[consumed:]
             self.assertEqual(parsed, None)
             self.assertTrue(consumed > 0)   # if a packet is corrupt then at least something should be consumed
             # get correct out_cuffer (in all of these cases it is just consuming to the next valid start byte (no more no less)
-            self.assertEqual(consumed, Stateless._next_possible_packet_index(in_buffer))
+            self.assertEqual(consumed, vesc_packet.Stateless._next_possible_packet_index(in_buffer))
         # check that the good packet is parsed
         in_buffer = bytearray(good_packet)
-        parsed, consumed = Stateless.unpack(in_buffer)
+        parsed, consumed = vesc_packet.decode(in_buffer)
         out_buffer = in_buffer[consumed:]
         self.assertEqual(parsed, test_payload)
         self.assertEqual(out_buffer, b'')
 
     def test_corrupt_recovery(self):
-        import random
-        import struct
-        from vesc.packet import Stateless
+        import vesc.packet.codec as vesc_packet
         # make a good packet
         test_payload = b'Te!'
         good_packet = b'\x02\x03Te!\xaa\x98\x03'
@@ -194,14 +190,14 @@ class TestPacket(TestCase):
         # check that exceptions are given on each corrupt packet
         for corrupt in corrupt_packets:
             in_buffer = bytearray(corrupt)
-            parsed, consumed = Stateless.unpack(in_buffer)
+            parsed, consumed = vesc_packet.decode(in_buffer)
             out_buffer = in_buffer[consumed:]
             self.assertEqual(parsed, payload_to_recover)
             found_packet_start = corrupt.find(packet_to_recover)
             self.assertTrue(consumed == (found_packet_start + len(packet_to_recover)))
         # check that the good packet is parsed
         in_buffer = bytearray(good_packet)
-        parsed, consumed = Stateless.unpack(in_buffer)
+        parsed, consumed = vesc_packet.decode(in_buffer)
         out_buffer = in_buffer[consumed:]
         self.assertEqual(parsed, test_payload)
         self.assertEqual(out_buffer, b'')
@@ -209,26 +205,26 @@ class TestPacket(TestCase):
 class TestMsg(TestCase):
     def setUp(self):
         import copy
-        from vesc.msg import MsgRegistry
-        self._initial_registry = copy.deepcopy(MsgRegistry._registry)
+        from vesc.messages.base import VESCMessage
+        self._initial_registry = copy.deepcopy(VESCMessage._msg_registry)
 
     def tearDown(self):
-        from vesc.msg import MsgRegistry
-        MsgRegistry._registry = self._initial_registry
+        from vesc.messages.base import VESCMessage
+        VESCMessage._msg_registry = self._initial_registry
         self._initial_registry = None
 
-
     def verify_packing_and_unpacking(self, msg):
-        from vesc.msg import Msg
-        payload_bytes = msg.pack()
-        parsed_msg = Msg.unpack(payload_bytes)
+        from vesc.messages.base import VESCMessage
+        payload_bytestring = VESCMessage.encode(msg)
+        parsed_msg = VESCMessage.decode(payload_bytestring)
         self.assertEqual(parsed_msg.id, msg.id)
         for name in [names[0] for names in msg.fields]:
             self.assertEqual(getattr(parsed_msg, name), getattr(msg, name))
 
     def test_single_message(self):
-        from vesc.msg import Msg
-        class testMsg1(Msg):
+        from vesc.messages.base import VESCMessage
+
+        class TestMsg1(metaclass=VESCMessage):
             id = 0x12
             fields = [
                 ('f1', 'B'),
@@ -239,13 +235,13 @@ class TestMsg(TestCase):
                 ('f6', 'I'),
             ]
 
-        test_message = testMsg1(27, 25367, -1124192846, 2244862237, 17, 73262)
+        test_message = TestMsg1(27, 25367, -1124192846, 2244862237, 17, 73262)
         self.verify_packing_and_unpacking(test_message)
 
     def test_multiple_messages(self):
-        from vesc.msg import Msg
+        from vesc.messages.base import VESCMessage
 
-        class testMsg1(Msg):
+        class testMsg1(metaclass=VESCMessage):
             id = 0x15
             fields = [
                 ('f1', 'B'),
@@ -256,14 +252,14 @@ class TestMsg(TestCase):
                 ('f6', 'I'),
             ]
 
-        class testMsg2(Msg):
+        class testMsg2(metaclass=VESCMessage):
             id = 0x19
             fields = [
                 ('f1', 'B'),
                 ('f2', 'B'),
             ]
 
-        class testMsg3(Msg):
+        class testMsg3(metaclass=VESCMessage):
             id = 0x11
             fields = [
                 ('f1', 'i'),
@@ -271,18 +267,20 @@ class TestMsg(TestCase):
             ]
 
         test_message1 = testMsg1(27, 25367, -1124192846, 2244862237, 17, 73262)
+        test_message12 = testMsg1(82, 45132, 382136436, 27374, 18, 72134)
         test_message2 = testMsg2(27, 13)
+        test_message22 = testMsg2(52, 19)
         test_message3 = testMsg3(-7841, 4611)
+        test_message32 = testMsg3(-123, 4123)
         self.verify_packing_and_unpacking(test_message1)
         self.verify_packing_and_unpacking(test_message2)
         self.verify_packing_and_unpacking(test_message3)
 
     def test_errors(self):
-        from vesc.msg import Msg
-        from vesc.exceptions import DuplicateMessageID
+        from vesc.messages.base import VESCMessage
 
         # try to make two messages with the same ID
-        class testMsg1(Msg):
+        class testMsg1(metaclass=VESCMessage):
             id = 0x01
             fields = [
                 ('f1', 'H'),
@@ -290,13 +288,26 @@ class TestMsg(TestCase):
             ]
         caught = False
         try:
-            class testMsg2(Msg):
+            class testMsg2(metaclass=VESCMessage):
                 id = 0x01
                 fields = [
                     ('f1', 'B'),
                     ('f2', 'B'),
                 ]
-        except DuplicateMessageID as e:
+        except TypeError as e:
+            caught = True
+        self.assertTrue(caught)
+
+        # check that message classes are final
+        caught = False
+        try:
+            class testMsg4(testMsg1):
+                id = 0x01
+                fields = [
+                    ('f1', 'B'),
+                    ('f2', 'B'),
+                ]
+        except TypeError as e:
             caught = True
         self.assertTrue(caught)
 

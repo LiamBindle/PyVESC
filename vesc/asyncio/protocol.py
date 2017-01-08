@@ -1,13 +1,16 @@
 import asyncio
 import logging
-from .packet import Footer
-from .codec import encode
-from .codec import decode
+from ..packet.codec import encode as encode_packet
+from ..packet.codec import decode as decode_packet
+from ..packet.codec import Footer
+from ..messages.base import VESCMessage
 
 
-class Protocol(asyncio.Protocol):
-    def __init__(self, callback):
-        self.callback = callback
+class VESCProtocol(asyncio.Protocol):
+    def __init__(self, recv_callback):
+        self.recv_callback = recv_callback
+        self.buffer = None
+        self.transport = None
 
     def connection_made(self, transport):
         self.transport = transport
@@ -23,7 +26,7 @@ class Protocol(asyncio.Protocol):
         self.buffer.extend(data)
         # if the terminator is in data, attempt to parse the packet
         if Footer.TERMINATOR in data:
-            payload, consumed = decode(self.buffer)
+            msg_bytes, consumed = decode_packet(self.buffer)
             self.buffer = self.buffer[consumed:]
-            if payload:
-                self.callback(payload)
+            if msg_bytes:
+                self.recv_callback(VESCMessage.decode(msg_bytes))
