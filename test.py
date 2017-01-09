@@ -266,15 +266,27 @@ class TestMsg(TestCase):
                 ('f2', 'i'),
             ]
 
+        class testMsg4(metaclass=VESCMessage):
+            id = 0x24
+            fields = [
+                ('f1', 'i'),
+                ('f2', 's'),
+                ('f3', 'i'),
+                ('f4', 'B'),
+                ('f5', 'i'),
+            ]
+
         test_message1 = testMsg1(27, 25367, -1124192846, 2244862237, 17, 73262)
         test_message12 = testMsg1(82, 45132, 382136436, 27374, 18, 72134)
         test_message2 = testMsg2(27, 13)
         test_message22 = testMsg2(52, 19)
         test_message3 = testMsg3(-7841, 4611)
         test_message32 = testMsg3(-123, 4123)
+        test_message4 = testMsg4(4531, 'hello world', 1421, 34, 14215)
         self.verify_packing_and_unpacking(test_message1)
         self.verify_packing_and_unpacking(test_message2)
         self.verify_packing_and_unpacking(test_message3)
+        self.verify_packing_and_unpacking(test_message4)
 
     def test_errors(self):
         from vesc.messages.base import VESCMessage
@@ -311,6 +323,31 @@ class TestMsg(TestCase):
             caught = True
         self.assertTrue(caught)
 
+        # check that no more than 1 string field is allowed
+        caught = False
+        try:
+            class testMsg7(metaclass=VESCMessage):
+                id = 0x02
+                fields = [
+                    ('f1', 's'),
+                    ('f2', 's'),
+                ]
+        except TypeError as e:
+            caught = True
+        self.assertTrue(caught)
+
+        # check that 's' is used instead of 'p'
+        caught = False
+        try:
+            class testMsg8(metaclass=VESCMessage):
+                id = 0x31
+                fields = [
+                    ('f1', 'p'),
+                ]
+        except TypeError as e:
+            caught = True
+        self.assertTrue(caught)
+
         # try to fill a message with the wrong number of arguments
         caught = False
         try:
@@ -319,6 +356,3 @@ class TestMsg(TestCase):
             caught = True
         self.assertTrue(caught)
 
-
-class TestAIOProtocol(TestCase):
-    pass
