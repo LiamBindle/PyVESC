@@ -30,3 +30,8 @@ class VESCProtocol(asyncio.Protocol):
             self.buffer = self.buffer[consumed:]
             if msg_bytes:
                 self.recv_callback(self, VESCMessage.decode(msg_bytes))
+
+    def write(self, msg):
+        payload_bytes = VESCMessage.encode(msg)
+        packet = encode_packet(payload_bytes)
+        self.transport.write(packet)
