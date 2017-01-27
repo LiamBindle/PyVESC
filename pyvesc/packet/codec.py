@@ -1,5 +1,5 @@
-from .structure import *
-from .exceptions import *
+from pyvesc.packet.structure import *
+from pyvesc.packet.exceptions import *
 from PyCRC.CRC16 import CRC16
 
 
@@ -224,8 +224,8 @@ class Stateless(UnpackerBase, PackerBase):
         """
         return Stateless._pack(payload)
 
-def encode(bytestring):
+def frame(bytestring):
     return Stateless.pack(bytestring)
 
-def decode(buffer, errors='ignore'):
+def unframe(buffer, errors='ignore'):
     return Stateless.unpack(buffer, errors)

@@ -58,7 +58,7 @@ class VESCMessage(type):
         return VESCMessage._msg_registry[id]
 
     @staticmethod
-    def decode(msg_bytes):
+    def unpack(msg_bytes):
         msg_id = struct.unpack_from(VESCMessage._endian_fmt + VESCMessage._id_fmt, msg_bytes, 0)
         msg_type = VESCMessage.msg_type(*msg_id)
         data = None
@@ -79,7 +79,7 @@ class VESCMessage(type):
         return msg
 
     @staticmethod
-    def encode(instance):
+    def pack(instance):
         field_values = []
         for field_name in instance._field_names:
             field_values.append(getattr(instance, field_name))

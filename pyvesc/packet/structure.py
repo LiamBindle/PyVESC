@@ -1,6 +1,6 @@
 import collections
 import struct
-from .exceptions import *
+from pyvesc.packet.exceptions import *
 from PyCRC.CRC16 import CRC16
 
 
