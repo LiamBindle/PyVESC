@@ -2,7 +2,7 @@ import pyvesc
 
 def simple_example():
     # lets make a SetDuty message
-    my_msg = pyvesc.SetDuty(255)
+    my_msg = pyvesc.SetDutyCycle(255)
 
     # now lets encode it to make get a byte string back
     packet = pyvesc.encode(my_msg)
@@ -17,7 +17,7 @@ def simple_example():
     buffer = buffer[consumed:]
 
     # check that the message we parsed is equivalent to my_msg
-    assert my_msg.duty == msg.duty
+    assert my_msg.duty_cycle == msg.duty_cycle
 
 
 
