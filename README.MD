@@ -6,7 +6,7 @@ Benjamin Vedder. Its a great project with a really great community and I'd urge
 anyone interested in motor controllers to take a look at it.
 
 
-This repository was developed by the [University of Saskatchewan Space Design
+This repository was developed for the [University of Saskatchewan Space Design
 Team](https://usst.ca), as we are currently using these controllers for all of
 our motor controller needs.
 
