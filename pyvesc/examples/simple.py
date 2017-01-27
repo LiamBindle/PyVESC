@@ -17,7 +17,7 @@ def simple_example():
     buffer = buffer[consumed:]
 
     # check that the message we parsed is equivalent to my_msg
-    assert my_msg.pwm == msg.pwm
+    assert my_msg.duty == msg.duty
 
 
 
