@@ -120,27 +120,27 @@ class TestPacket(TestCase):
         import pyvesc.packet.codec as vesc_packet
         # make a good packet
         test_payload = b'Te!'
-        good_packet = b'\x02\x03Te!\xaa\x98\x03'
+        good_packet = b'\x02\x03Te!\x92B\x03'
         corrupt_packets = []
         # corrupt first byte
-        corrupt = b'\x01\x03Te!\xaa\x98\x03'
+        corrupt = b'\x01\x03Te!\x92B\x03'
         corrupt_packets.append(corrupt)
         # corrupt payload_length (to be smaller and larger)
-        smaller_corrupt = b'\x02\x02Te!\xaa\x98\x03'
-        larger_corrupt = b'\x02\x04Te!\xaa\x98\x03\x03'
+        smaller_corrupt = b'\x02\x02Te!\x92B\x03'
+        larger_corrupt = b'\x02\x04Te!\x92B\x03\x03'
         corrupt_packets.append(smaller_corrupt)
         corrupt_packets.append(larger_corrupt)
         # corrupt first byte in payload
-        corrupt = b'\x02\x03se!\xaa\x98\x03'
+        corrupt = b'\x02\x03se!\x92B\x03'
         corrupt_packets.append(corrupt)
         # corrupt last byte in payload
-        corrupt = b'\x02\x03Tey\xaa\x98\x03'
+        corrupt = b'\x02\x03Tey\x92B\x03'
         corrupt_packets.append(corrupt)
         # corrupt crc
         corrupt = b'\x02\x03Te!\xaa\x91\x03'
         corrupt_packets.append(corrupt)
         # corrupt terminator
-        corrupt = b'\x02\x03Te!\xaa\x98\x09'
+        corrupt = b'\x02\x03Te!\x92B\x09'
         corrupt_packets.append(corrupt)
         # check that exceptions are given on each corrupt packet
         for corrupt in corrupt_packets:
@@ -162,30 +162,30 @@ class TestPacket(TestCase):
         import pyvesc.packet.codec as vesc_packet
         # make a good packet
         test_payload = b'Te!'
-        good_packet = b'\x02\x03Te!\xaa\x98\x03'
-        packet_to_recover = b'\x02\x04!\xe1$ @\xd2\x03' # goal is to recover this packet
+        good_packet = b'\x02\x03Te!\x92B\x03'
+        packet_to_recover = b'\x02\x04!\xe1$ \xbb8\x03' # goal is to recover this packet
         payload_to_recover = b'!\xe1$ '
         after_goal = b'\x05\x09\x01' # mimic another corrupt packet after
         corrupt_packets = []
         # corrupt first byte
-        corrupt = b'\x01\x03Te!\xaa\x98\x03'
+        corrupt = b'\x01\x03Te!\x92B\x03'
         corrupt_packets.append(corrupt + packet_to_recover + after_goal)
         # corrupt payload_length (to be smaller and larger)
-        smaller_corrupt = b'\x02\x02Te!\xaa\x98\x03'
-        larger_corrupt = b'\x02\x04Te!\xaa\x98\x03\x03'
+        smaller_corrupt = b'\x02\x02Te!\x92B\x03'
+        larger_corrupt = b'\x02\x04Te!\x92B\x03\x03'
         corrupt_packets.append(smaller_corrupt + packet_to_recover + after_goal)
         corrupt_packets.append(larger_corrupt + packet_to_recover + after_goal)
         # corrupt first byte in payload
-        corrupt = b'\x02\x03se!\xaa\x98\x03'
+        corrupt = b'\x02\x03se!\x92B\x03'
         corrupt_packets.append(corrupt + packet_to_recover + after_goal)
         # corrupt last byte in payload
-        corrupt = b'\x02\x03Tey\xaa\x98\x03'
+        corrupt = b'\x02\x03Tey\x92B\x03'
         corrupt_packets.append(corrupt + packet_to_recover + after_goal)
         # corrupt crc
         corrupt = b'\x02\x03Te!\xaa\x91\x03'
         corrupt_packets.append(corrupt + packet_to_recover + after_goal)
         # corrupt terminator
-        corrupt = b'\x02\x03Te!\xaa\x98\x09'
+        corrupt = b'\x02\x03Te!\x92B\x09'
         corrupt_packets.append(corrupt + packet_to_recover + after_goal)
         # check that exceptions are given on each corrupt packet
         for corrupt in corrupt_packets:

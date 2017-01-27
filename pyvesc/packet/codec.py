@@ -1,6 +1,6 @@
 from pyvesc.packet.structure import *
 from pyvesc.packet.exceptions import *
-from PyCRC.CRC16 import CRC16
+from PyCRC.CRCCCITT import CRCCCITT
 
 
 class UnpackerBase(object):
@@ -110,7 +110,7 @@ class UnpackerBase(object):
         :param footer: Footer object
         :return: void
         """
-        if CRC16().calculate(payload) != footer.crc:
+        if CRCCCITT().calculate(payload) != footer.crc:
             raise CorruptPacket("Invalid checksum value.")
         if footer.terminator is not Footer.TERMINATOR:
             raise CorruptPacket("Invalid terminator: %u" % footer.terminator)
