@@ -41,9 +41,9 @@ class Header(collections.namedtuple('Header', ['payload_index', 'payload_length'
         :return: The character format of the packet header.
         """
         if start_byte is 0x2:
-            return '<BB'
+            return '>BB'
         elif start_byte is 0x3:
-            return '<BH'
+            return '>BH'
         else:
             raise CorruptPacket("Invalid start byte: %u" % start_byte)
 
@@ -70,4 +70,4 @@ class Footer(collections.namedtuple('Footer', ['crc', 'terminator'])):
         Format of the footer.
         :return: Character format of the footer.
         """
-        return '<HB'
+        return '>HB'

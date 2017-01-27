@@ -10,7 +10,7 @@ class VESCMessage(type):
     format character. For more info on struct format characters see: https://docs.python.org/2/library/struct.html
     """
     _msg_registry = {}
-    _endian_fmt = '<'
+    _endian_fmt = '>'
     _id_fmt = 'B'
     _entry_msg_registry = None
 
