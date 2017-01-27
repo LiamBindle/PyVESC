@@ -1,4 +1,4 @@
-# PyVESC
+# PyVESC [![Build Status](https://travis-ci.org/LiamBindle/vesc.svg?branch=init-dev)](https://travis-ci.org/LiamBindle/vesc)
 PyVESC is aimed at being a easy to use and robust python implementation of the
 communication protocol used by the
 [VESC - Open Source ESC](http://vedder.se/2015/01/vesc-open-source-esc/) by
@@ -17,6 +17,7 @@ messages and well as robust in handling corrupt data packets.
 
 This is accomplished by breaking the project up into two somewhat distinct
 ideas:
+
 1. A means for encoding (object to bytes) and decoding (bytes to object) objects
 which represent messages. These objects should be easily extensible and easy to
 declare. This is accomplished in the ```pyvesc.messages``` module.
