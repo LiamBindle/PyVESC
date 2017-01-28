@@ -2,6 +2,11 @@ from .base import VESCMessage
 
 
 class SetDutyCycle(metaclass=VESCMessage):
+    """Set the duty cycle.
+
+    Attributes:
+        duty_cycle Value of duty cycle.
+    """
     id = 5
     fields = [
         ('duty_cycle', 'f')
