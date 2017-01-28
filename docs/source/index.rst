@@ -1,8 +1,5 @@
 PyVESC Documentation
 ====================
-.. toctree::
-   :maxdepth: 2
-
 PyVESC is aimed at being a easy to use and robust python implementation of the
 communication protocol used by the
 `VESC - Open Source ESC <http://vedder.se/2015/01/vesc-open-source-esc/>`_
