@@ -50,7 +50,11 @@ being filled by your UART connection)
 
 Installation
 ============
-TODO: write
+PyVESC is available on the `Python Package Index <https://pypi.python.org/pypi/pyvesc>`_.
+
+.. code-block:: bash
+
+  pip install pyvesc
 
 Usage
 =====
