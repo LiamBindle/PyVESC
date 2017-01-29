@@ -1,4 +1,8 @@
 from distutils.core import setup
+
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
+
 setup(
   name = 'pyvesc',
   packages = ['pyvesc'],
@@ -10,4 +14,5 @@ setup(
   download_url = 'https://github.com/LiamBindle/PyVESC/tarball/1.0.2',
   keywords = ['vesc', 'VESC', 'communication', 'protcol', 'packet'],
   classifiers = [],
+  install_requires=required
 )
