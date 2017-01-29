@@ -23,7 +23,7 @@ that PyVESC is:
   development
 
 ## Documentation
-For PyVESC's documentation [Read The Docs](http://pyvesc.readthedocs.io/en/latest/)
+For the latest version of PyVESC's documentation [Read The Docs](http://pyvesc.readthedocs.io/en/latest/)
 
 ## Contributing
 Obviously this is just a quick and dirty project; however, if you have any ideas,
