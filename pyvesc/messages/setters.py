@@ -2,10 +2,9 @@ from .base import VESCMessage
 
 
 class SetDutyCycle(metaclass=VESCMessage):
-    """Set the duty cycle.
+    """ Set the duty cycle.
 
-    Attributes:
-        duty_cycle Value of duty cycle.
+    :ivar duty_cycle: Value of duty cycle to be set.
     """
     id = 5
     fields = [
@@ -14,6 +13,10 @@ class SetDutyCycle(metaclass=VESCMessage):
 
 
 class SetRPM(metaclass=VESCMessage):
+    """ Set the RPM.
+
+    :ivar rpm: Value to set the RPM to.
+    """
     id = 8
     fields = [
         ('rpm', 'i')
@@ -21,6 +24,10 @@ class SetRPM(metaclass=VESCMessage):
 
 
 class SetCurrent(metaclass=VESCMessage):
+    """ Set the current to the motor.
+
+    :ivar current: Value to set the current to.
+    """
     id = 6
     fields = [
         ('current', 'f')
@@ -28,6 +35,10 @@ class SetCurrent(metaclass=VESCMessage):
 
 
 class SetCurrentBrake(metaclass=VESCMessage):
+    """ Set the current brake.
+
+    :ivar current_brake: Value to set the current brake to.
+    """
     id = 7
     fields = [
         ('current_brake', 'f')
