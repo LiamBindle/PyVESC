@@ -82,10 +82,10 @@ Setter Messages
 ^^^^^^^^^^^^^^^
 These are the setter messages which are currently implemented.
 
-.. autoclass:: pyvesc.SetDutyCycle
-.. autoclass:: pyvesc.SetRPM
-.. autoclass:: pyvesc.SetCurrent
-.. autoclass:: pyvesc.SetCurrentBrake
+.. autoclass:: pyvesc.messages.SetDutyCycle
+.. autoclass:: pyvesc.messages.SetRPM
+.. autoclass:: pyvesc.messages.SetCurrent
+.. autoclass:: pyvesc.messages.SetCurrentBrake
 
 Getter Messages
 ^^^^^^^^^^^^^^^
