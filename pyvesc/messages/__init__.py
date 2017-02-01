@@ -1,3 +1,3 @@
-from .base import *
-from .getters import *
-from .setters import *
+from pyvesc.messages.base import *
+from pyvesc.messages.getters import *
+from pyvesc.messages.setters import *
