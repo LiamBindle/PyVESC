@@ -54,7 +54,7 @@ PyVESC is available on the `Python Package Index <https://pypi.python.org/pypi/p
 
 .. code-block:: bash
 
-  pip install pyvesc
+  pip install py_vesc
 
 Usage
 =====

@@ -4,3 +4,4 @@ venv/
 docs/build/
 MANIFEST
 dist/
+pyvesc.egg-info/
