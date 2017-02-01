@@ -1,4 +1,4 @@
-from .base import VESCMessage
+from pyvesc.messages.base import VESCMessage
 
 
 class SetDutyCycle(metaclass=VESCMessage):

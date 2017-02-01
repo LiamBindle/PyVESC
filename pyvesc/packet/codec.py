@@ -1,5 +1,5 @@
-from .structure import *
-from .exceptions import *
+from pyvesc.packet.structure import *
+from pyvesc.packet.exceptions import *
 from PyCRC.CRCCCITT import CRCCCITT
 
 

@@ -18,6 +18,7 @@ def simple_example():
 
     # check that the message we parsed is equivalent to my_msg
     assert my_msg.duty_cycle == msg.duty_cycle
+    print("Success!")
 
 
 

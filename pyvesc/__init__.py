@@ -1,2 +1,2 @@
-from .interface import *
-from .messages import *
+from pyvesc.interface import *
+from pyvesc.messages import *
