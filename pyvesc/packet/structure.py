@@ -1,6 +1,6 @@
 import collections
 import struct
-from pyvesc.packet.exceptions import *
+from .exceptions import *
 from PyCRC.CRCCCITT import CRCCCITT
 
 

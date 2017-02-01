@@ -1,5 +1,5 @@
-from pyvesc.messages.base import VESCMessage
-from pyvesc.packet.codec import unframe, frame
+from .messages.base import VESCMessage
+from .packet.codec import unframe, frame
 
 def decode(buffer):
     """
