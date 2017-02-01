@@ -1,6 +1,6 @@
-import pyvesc.messages.base
+from pyvesc.messages.base import VESCMessage
 
-class SetDutyCycle(metaclass=pyvesc.messages.base.VESCMessage):
+class SetDutyCycle(metaclass=VESCMessage):
     """ Set the duty cycle.
 
     :ivar duty_cycle: Value of duty cycle to be set.
@@ -11,7 +11,7 @@ class SetDutyCycle(metaclass=pyvesc.messages.base.VESCMessage):
     ]
 
 
-class SetRPM(metaclass=pyvesc.messages.base.VESCMessage):
+class SetRPM(metaclass=VESCMessage):
     """ Set the RPM.
 
     :ivar rpm: Value to set the RPM to.
@@ -22,7 +22,7 @@ class SetRPM(metaclass=pyvesc.messages.base.VESCMessage):
     ]
 
 
-class SetCurrent(metaclass=pyvesc.messages.base.VESCMessage):
+class SetCurrent(metaclass=VESCMessage):
     """ Set the current to the motor.
 
     :ivar current: Value to set the current to.
@@ -33,7 +33,7 @@ class SetCurrent(metaclass=pyvesc.messages.base.VESCMessage):
     ]
 
 
-class SetCurrentBrake(metaclass=pyvesc.messages.base.VESCMessage):
+class SetCurrentBrake(metaclass=VESCMessage):
     """ Set the current brake.
 
     :ivar current_brake: Value to set the current brake to.
