@@ -24,7 +24,9 @@ def encode(msg):
     Encodes a PyVESC message to a packet. This packet is a valid VESC packet and
     can be sent to a VESC via your serial port.
 
-    :param msg: PyVESC message to be encoded. All fields must be initialized.
+    :param msg: Message to be encoded. All fields must be initialized.
+    :type msg: PyVESC message
+    
     :return: The packet.
     :rtype: bytes
     """
