@@ -62,7 +62,8 @@ class VESCMessage(type):
         msg_id = struct.unpack_from(VESCMessage._endian_fmt + VESCMessage._id_fmt, msg_bytes, 0)
         msg_type = VESCMessage.msg_type(*msg_id)
         data = None
-        if msg_type._string_field:
+        if not (msg_type._string_field is None):
+            # string field
             fmt_wo_string = msg_type._fmt_fields.replace('%u', '')
             fmt_wo_string = fmt_wo_string.replace('s', '')
             len_string = len(msg_bytes) - struct.calcsize(VESCMessage._endian_fmt + fmt_wo_string) - 1
@@ -71,7 +72,7 @@ class VESCMessage(type):
         else:
             data = struct.unpack_from(VESCMessage._endian_fmt + msg_type._fmt_fields, msg_bytes, 1)
         msg = msg_type(*data)
-        if msg_type._string_field:
+        if not (msg_type._string_field is None):
             string_field_name = msg_type._field_names[msg_type._string_field]
             setattr(msg,
                     string_field_name,
@@ -83,7 +84,8 @@ class VESCMessage(type):
         field_values = []
         for field_name in instance._field_names:
             field_values.append(getattr(instance, field_name))
-        if instance._string_field:
+        if not (instance._string_field is None):
+            # string field
             string_field_name = instance._field_names[instance._string_field]
             string_length = len(getattr(instance, string_field_name))
             fmt = VESCMessage._endian_fmt + VESCMessage._id_fmt + (instance._fmt_fields  % (string_length))
