@@ -7,7 +7,7 @@ class SetDutyCycle(metaclass=VESCMessage):
     """
     id = 5
     fields = [
-        ('duty_cycle', 'f')
+        ('duty_cycle', 'i')
     ]
 
 
