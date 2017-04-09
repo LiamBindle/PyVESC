@@ -29,8 +29,13 @@ class VESCMessage(type):
         cls._string_field = None
         cls._fmt_fields = ''
         cls._field_names = []
+        cls._field_scalars = []
         for field, idx in zip(cls.fields, range(0, len(cls.fields))):
             cls._field_names.append(field[0])
+            try:
+                cls._field_scalars.append(field[2])
+            except:
+                pass
             if field[1] is 's':
                 # string field, add % so we can vary the length
                 cls._fmt_fields += '%u'
@@ -70,7 +75,12 @@ class VESCMessage(type):
             fmt_w_string = msg_type._fmt_fields % (len_string)
             data = struct.unpack_from(VESCMessage._endian_fmt + fmt_w_string, msg_bytes, 1)
         else:
-            data = struct.unpack_from(VESCMessage._endian_fmt + msg_type._fmt_fields, msg_bytes, 1)
+            data = list(struct.unpack_from(VESCMessage._endian_fmt + msg_type._fmt_fields, msg_bytes, 1))
+            for k, field in enumerate(data):
+                try:
+                    data[k] = data[k]/msg_type._field_scalars[k]
+                except:
+                    pass
         msg = msg_type(*data)
         if not (msg_type._string_field is None):
             string_field_name = msg_type._field_names[msg_type._string_field]
@@ -94,4 +104,3 @@ class VESCMessage(type):
             return struct.pack(fmt, *values)
         else:
             return struct.pack(VESCMessage._endian_fmt + VESCMessage._id_fmt + instance._fmt_fields, *((instance.id,) + tuple(field_values)))
-

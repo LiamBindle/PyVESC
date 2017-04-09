@@ -1,29 +1,29 @@
 from pyvesc.messages.base import VESCMessage
 
 class GetValues(metaclass=VESCMessage):
-    """ Gets internal sensor data
+    """
+    Gets internal sensor data
     """
     id = 4
-    # When sending the request for this info, a blank ID must be sent
-    #    fields = []
+
     fields = [
-            ('temp_mos1', 'e'),
-            ('temp_mos2', 'e'),
-            ('temp_mos3', 'e'),
-            ('temp_mos4', 'e'),
-            ('temp_mos5', 'e'),
-            ('temp_mos6', 'e'),
-            ('temp_pcb',  'e'),
-            ('current_motor', 'f'),
-            ('current_in',  'f'),
-            ('duty_now',    'e'),
-            ('rpm',         'f'),
-            ('v_in',        'e'),
-            ('amp_hours',   'f'),
-            ('amp_hours_charged', 'f'),
-            ('watt_hours',  'f'),
-            ('watt_hours_charged', 'f'),
-            ('tachometer', 'l'),
-            ('tachometer_abs', 'l'),
+            ('temp_mos1', 'h', 10),
+            ('temp_mos2', 'h', 10),
+            ('temp_mos3', 'h', 10),
+            ('temp_mos4', 'h', 10),
+            ('temp_mos5', 'h', 10),
+            ('temp_mos6', 'h', 10),
+            ('temp_pcb',  'h', 10),
+            ('current_motor', 'i', 100),
+            ('current_in',  'i', 100),
+            ('duty_now',    'h', 1000),
+            ('rpm',         'i', 1),
+            ('v_in',        'h', 10),
+            ('amp_hours',   'i', 10000),
+            ('amp_hours_charged', 'i', 10000),
+            ('watt_hours',  'i', 10000),
+            ('watt_hours_charged', 'i', 10000),
+            ('tachometer', 'i', 1),
+            ('tachometer_abs', 'i', 1),
             ('mc_fault_code', 'c')
     ]
