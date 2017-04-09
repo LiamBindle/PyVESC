@@ -34,7 +34,7 @@ class VESCMessage(type):
             cls._field_names.append(field[0])
             try:
                 cls._field_scalars.append(field[2])
-            except:
+            except IndexError:
                 pass
             if field[1] is 's':
                 # string field, add % so we can vary the length
@@ -79,7 +79,7 @@ class VESCMessage(type):
             for k, field in enumerate(data):
                 try:
                     data[k] = data[k]/msg_type._field_scalars[k]
-                except:
+                except (TypeError, IndexError) as e:
                     pass
         msg = msg_type(*data)
         if not (msg_type._string_field is None):
