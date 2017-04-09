@@ -80,7 +80,10 @@ class VESCMessage(type):
         return msg
 
     @staticmethod
-    def pack(instance):
+    def pack(instance, header_only = None):
+        if header_only:
+            return struct.pack(VESCMessage._endian_fmt + VESCMessage._id_fmt, instance.id)
+
         field_values = []
         for field_name in instance._field_names:
             field_values.append(getattr(instance, field_name))
