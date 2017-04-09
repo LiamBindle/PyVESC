@@ -7,6 +7,7 @@ class VESCMessage(type):
     This is the metaclass for any VESC message classes. A VESC message class must then declare 2 static attributes:
     id: unsigned integer which is the identification number for messages of this class
     fields: list of tuples. tuples are of size 2, first element is the field name, second element is the fields type
+            the third optional element is a scalar that will be applied to the data upon unpack
     format character. For more info on struct format characters see: https://docs.python.org/2/library/struct.html
     """
     _msg_registry = {}
