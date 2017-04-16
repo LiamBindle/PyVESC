@@ -7,6 +7,7 @@ class VESCMessage(type):
     This is the metaclass for any VESC message classes. A VESC message class must then declare 2 static attributes:
     id: unsigned integer which is the identification number for messages of this class
     fields: list of tuples. tuples are of size 2, first element is the field name, second element is the fields type
+            the third optional element is a scalar that will be applied to the data upon unpack
     format character. For more info on struct format characters see: https://docs.python.org/2/library/struct.html
     """
     _msg_registry = {}
@@ -29,8 +30,13 @@ class VESCMessage(type):
         cls._string_field = None
         cls._fmt_fields = ''
         cls._field_names = []
+        cls._field_scalars = []
         for field, idx in zip(cls.fields, range(0, len(cls.fields))):
             cls._field_names.append(field[0])
+            try:
+                cls._field_scalars.append(field[2])
+            except IndexError:
+                pass
             if field[1] is 's':
                 # string field, add % so we can vary the length
                 cls._fmt_fields += '%u'
@@ -70,7 +76,12 @@ class VESCMessage(type):
             fmt_w_string = msg_type._fmt_fields % (len_string)
             data = struct.unpack_from(VESCMessage._endian_fmt + fmt_w_string, msg_bytes, 1)
         else:
-            data = struct.unpack_from(VESCMessage._endian_fmt + msg_type._fmt_fields, msg_bytes, 1)
+            data = list(struct.unpack_from(VESCMessage._endian_fmt + msg_type._fmt_fields, msg_bytes, 1))
+            for k, field in enumerate(data):
+                try:
+                    data[k] = data[k]/msg_type._field_scalars[k]
+                except (TypeError, IndexError) as e:
+                    pass
         msg = msg_type(*data)
         if not (msg_type._string_field is None):
             string_field_name = msg_type._field_names[msg_type._string_field]
@@ -85,8 +96,18 @@ class VESCMessage(type):
             return struct.pack(VESCMessage._endian_fmt + VESCMessage._id_fmt, instance.id)
 
         field_values = []
-        for field_name in instance._field_names:
-            field_values.append(getattr(instance, field_name))
+        #for field_name,field_scalar in zip(instance._field_names, instance._field_scalars):
+            #print(field_name, field_scalar)
+        #if instance._field_scalars:
+        #    for field_name, field_scalar in zip(instance._field_names, instance._field_scalars):
+        #        field_values.append(getattr(instance, field_name*field_scalar))
+        #else:
+        if not instance._field_scalars:
+            for field_name in instance._field_names:
+                field_values.append(getattr(instance, field_name))
+        else:
+            for field_name, field_scalar in zip(instance._field_names, instance._field_scalars):
+                field_values.append(int(getattr(instance, field_name) * field_scalar))
         if not (instance._string_field is None):
             # string field
             string_field_name = instance._field_names[instance._string_field]
@@ -97,4 +118,3 @@ class VESCMessage(type):
             return struct.pack(fmt, *values)
         else:
             return struct.pack(VESCMessage._endian_fmt + VESCMessage._id_fmt + instance._fmt_fields, *((instance.id,) + tuple(field_values)))
-
