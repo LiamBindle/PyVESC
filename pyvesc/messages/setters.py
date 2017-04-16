@@ -51,7 +51,7 @@ class SetPosition(metaclass=VESCMessage):
     """
     id = 9
     fields = [
-        ('pos', 'i')
+        ('pos', 'i', 1000000)
     ]
 
 class SetRotorPositionMode(metaclass=VESCMessage):

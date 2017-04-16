@@ -96,8 +96,18 @@ class VESCMessage(type):
             return struct.pack(VESCMessage._endian_fmt + VESCMessage._id_fmt, instance.id)
 
         field_values = []
-        for field_name in instance._field_names:
-            field_values.append(getattr(instance, field_name))
+        #for field_name,field_scalar in zip(instance._field_names, instance._field_scalars):
+            #print(field_name, field_scalar)
+        #if instance._field_scalars:
+        #    for field_name, field_scalar in zip(instance._field_names, instance._field_scalars):
+        #        field_values.append(getattr(instance, field_name*field_scalar))
+        #else:
+        if not instance._field_scalars:
+            for field_name in instance._field_names:
+                field_values.append(getattr(instance, field_name))
+        else:
+            for field_name, field_scalar in zip(instance._field_names, instance._field_scalars):
+                field_values.append(int(getattr(instance, field_name) * field_scalar))
         if not (instance._string_field is None):
             # string field
             string_field_name = instance._field_names[instance._string_field]
