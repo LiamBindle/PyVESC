@@ -242,7 +242,7 @@ class TestMsg(TestCase):
         from pyvesc.messages.base import VESCMessage
 
         class testMsg1(metaclass=VESCMessage):
-            id = 0x15
+            id = 0x45
             fields = [
                 ('f1', 'B'),
                 ('f2', 'H'),
@@ -381,7 +381,7 @@ class TestInterface(TestCase):
         from pyvesc.messages import VESCMessage
 
         class testMsg1(metaclass=VESCMessage):
-            id = 0x15
+            id = 0x45
             fields = [
                 ('f1', 'B'),
                 ('f2', 'H'),
