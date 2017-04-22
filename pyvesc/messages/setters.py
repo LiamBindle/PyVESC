@@ -4,7 +4,7 @@ from pyvesc.messages.base import VESCMessage
 class SetDutyCycle(metaclass=VESCMessage):
     """ Set the duty cycle.
 
-    :ivar duty_cycle: Value of duty cycle to be set.
+    :ivar duty_cycle: Value of duty cycle to be set (range [-1e5, 1e5]).
     """
     id = 5
     fields = [
@@ -45,9 +45,9 @@ class SetCurrentBrake(metaclass=VESCMessage):
     ]
 
 class SetPosition(metaclass=VESCMessage):
-    """
-        Set the rotor angle based off of an encoder or sensor
-        :ivar pos: Value to set the current position or angle to.
+    """Set the rotor angle based off of an encoder or sensor
+    
+    :ivar pos: Value to set the current position or angle to.
     """
     id = 9
     fields = [
@@ -55,14 +55,15 @@ class SetPosition(metaclass=VESCMessage):
     ]
 
 class SetRotorPositionMode(metaclass=VESCMessage):
-    """
-        Sets the rotor position feedback mode.
-        It is reccomended to use the defined modes as below
-            DISP_POS_OFF
-            DISP_POS_MODE_ENCODER
-            DISP_POS_MODE_PID_POS
-            DISP_POS_MODE_PID_POS_ERROR
-        :ivar pos_mode: Value of the mode
+    """Sets the rotor position feedback mode.
+        
+    It is reccomended to use the defined modes as below:
+        * DISP_POS_OFF
+        * DISP_POS_MODE_ENCODER
+        * DISP_POS_MODE_PID_POS
+        * DISP_POS_MODE_PID_POS_ERROR
+    
+    :ivar pos_mode: Value of the mode
     """
 
     DISP_POS_OFF = 0

@@ -1,8 +1,7 @@
 from pyvesc.messages.base import VESCMessage
 
 class GetValues(metaclass=VESCMessage):
-    """
-    Gets internal sensor data
+    """ Gets internal sensor data
     """
     id = 4
 
@@ -30,10 +29,10 @@ class GetValues(metaclass=VESCMessage):
 
 
 class GetRotorPosition(metaclass=VESCMessage):
-    """
-    Gets rotor position data
-        Note: Must be set to DISP_POS_MODE_ENCODER or DISP_POS_MODE_PID_POS (Mode 3 or Mode 4)
-        This is set by SetRotorPositionMode (id=21)
+    """ Gets rotor position data
+    
+    Must be set to DISP_POS_MODE_ENCODER or DISP_POS_MODE_PID_POS (Mode 3 or 
+    Mode 4). This is set by SetRotorPositionMode (id=21).
     """
     id = 21
 

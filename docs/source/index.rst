@@ -86,10 +86,15 @@ These are the setter messages which are currently implemented.
 .. autoclass:: pyvesc.SetRPM
 .. autoclass:: pyvesc.SetCurrent
 .. autoclass:: pyvesc.SetCurrentBrake
+.. autoclass:: pyvesc.SetPosition
+.. autoclass:: pyvesc.SetRotorPositionMode
 
 Getter Messages
 ^^^^^^^^^^^^^^^
-These are the getter messages which are currently implemented.
+These are the getters that are currently implemented.
+
+.. autoclass:: pyvesc.GetValues
+.. autoclass:: pyvesc.GetRotorPosition
 
 Implementing Additional Messages
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
