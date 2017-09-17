@@ -1,6 +1,7 @@
 import pyvesc.messages.base
 import pyvesc.packet.codec
 
+
 def decode(buffer):
     """
     Decodes the next valid VESC message in a buffer.

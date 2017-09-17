@@ -1,5 +1,10 @@
 PyVESC Documentation
-====================
+********************
+
+.. toctree::
+  :titlesonly:
+
+
 PyVESC is aimed at being a easy to use and robust python implementation of the
 communication protocol used by the
 `VESC - Open Source ESC <http://vedder.se/2015/01/vesc-open-source-esc/>`_
@@ -32,7 +37,7 @@ PyVESC can be used to go from a message (VESCMessage) to a packet (bytes).
 .. code-block:: python
 
   # make a SetDutyCycle message
-  my_msg = pyvesc.SetDutyCycle(255)
+  my_msg = pyvesc.SetDutyCycle(1e5)
   print(my_msg.duty_cycle) # prints value of my_msg.duty_cycle
   my_packet = pyvesc.encode(my_msg)
   # my_packet (type: bytes) can now be sent over your UART connection
@@ -64,7 +69,7 @@ PyVESC serves two purposes:
 #. Performs message encoding (to packet) and robust message decoding (to message object)
 
 Messages
---------
+========
 Here is a list of the messages currently supported in PyVESC. Note that not all
 of VESC's messages are implemented. This is because we have only implemented the
 messages we use as we don't want to distribute anything that hasn't been tested.
@@ -79,7 +84,7 @@ It should be noted that all message objects can be created in 3 ways:
 #. From decoding the next packet in a buffer
 
 Setter Messages
-^^^^^^^^^^^^^^^
+===============
 These are the setter messages which are currently implemented.
 
 .. autoclass:: pyvesc.SetDutyCycle
@@ -90,14 +95,14 @@ These are the setter messages which are currently implemented.
 .. autoclass:: pyvesc.SetRotorPositionMode
 
 Getter Messages
-^^^^^^^^^^^^^^^
+===============
 These are the getters that are currently implemented.
 
 .. autoclass:: pyvesc.GetValues
 .. autoclass:: pyvesc.GetRotorPosition
 
 Implementing Additional Messages
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+================================
 Here we'll take a look at how to implement your own messages. You're message
 class must have the metaclass `pyvesc.VESCMessage`. In addition to this you must
 define two static attributes:
@@ -116,16 +121,16 @@ the SetDutyCycle message.
   class SetDutyCycle(metaclass=pyvesc.VESCMessage):
       id = 5
       fields = [
-          ('duty_cycle', 'f')
+          ('duty_cycle', 'i')
       ]
 
 That's it! Taking a look at the declaration we see:
 
 * The message's ID is 5
-* The message has a single field with a name `duty_cycle` and type float32 (this
+* The message has a single field with a name `duty_cycle` and type int (this
   is what the
   `format characters <https://docs.python.org/3.5/library/struct.html#format-characters>`_
-  `'f'` is)
+  `'i'` is)
 
 If you are interested in the details of how this works, the `pyvesc.VESCMessage`
 metaclass has a registry of all its children this registry is a dictionary
@@ -135,7 +140,7 @@ unique.
 
 
 Encoding
---------
+========
 The following is the function call you should use to get a
 packet for your message.
 
@@ -145,7 +150,7 @@ Encoding is done by first serializing the message object and then framing it
 in a VESC packet.
 
 Decoding
---------
+========
 The following is the function you should call to decode messages from the
 buffer.
 
