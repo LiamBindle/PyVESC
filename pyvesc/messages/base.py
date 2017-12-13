@@ -13,6 +13,8 @@ class VESCMessage(type):
     _msg_registry = {}
     _endian_fmt = '>'
     _id_fmt = 'B'
+    _can_id_fmt = 'BB'
+    _comm_forward_can = 33
     _entry_msg_registry = None
 
     def __init__(cls, name, bases, clsdict):
@@ -50,6 +52,10 @@ class VESCMessage(type):
 
     def __call__(cls, *args, **kwargs):
         instance = super(VESCMessage, cls).__call__()
+        if 'can_id' in kwargs:
+            cls.can_id = kwargs['can_id']
+        else:
+            cls.can_id = None
         if args:
             if len(args) != len(cls.fields):
                 raise AttributeError("Expected %u arguments, received %u" % (len(cls.fields), len(args)))
@@ -91,7 +97,13 @@ class VESCMessage(type):
     @staticmethod
     def pack(instance, header_only = None):
         if header_only:
-            return struct.pack(VESCMessage._endian_fmt + VESCMessage._id_fmt, instance.id)
+            if instance.can_id is not None:
+                fmt = VESCMessage._endian_fmt + VESCMessage._can_id_fmt + VESCMessage._id_fmt
+                values = (VESCMessage._comm_forward_can, instance.can_id, instance.id)
+            else:
+                fmt = VESCMessage._endian_fmt + VESCMessage._id_fmt
+                values = (instance.id,)
+            return struct.pack(fmt, *values)
 
         field_values = []
         if not instance._field_scalars:
@@ -104,9 +116,20 @@ class VESCMessage(type):
             # string field
             string_field_name = instance._field_names[instance._string_field]
             string_length = len(getattr(instance, string_field_name))
-            fmt = VESCMessage._endian_fmt + VESCMessage._id_fmt + (instance._fmt_fields  % (string_length))
             field_values[instance._string_field] = field_values[instance._string_field].encode('ascii')
             values = ((instance.id,) + tuple(field_values))
+            if instance.can_id is not None:
+                fmt = VESCMessage._endian_fmt + VESCMessage._can_id_fmt + VESCMessage._id_fmt\
+                      + (instance._fmt_fields % (string_length))
+                values = (VESCMessage._comm_forward_can, instance.can_id) + values
+            else:
+                fmt = VESCMessage._endian_fmt + VESCMessage._id_fmt + (instance._fmt_fields % (string_length))
             return struct.pack(fmt, *values)
         else:
-            return struct.pack(VESCMessage._endian_fmt + VESCMessage._id_fmt + instance._fmt_fields, *((instance.id,) + tuple(field_values)))
+            values = ((instance.id,) + tuple(field_values))
+            if instance.can_id is not None:
+                fmt = VESCMessage._endian_fmt + VESCMessage._can_id_fmt + VESCMessage._id_fmt + instance._fmt_fields
+                values = (VESCMessage._comm_forward_can, instance.can_id) + values
+            else:
+                fmt = VESCMessage._endian_fmt + VESCMessage._id_fmt + instance._fmt_fields
+            return struct.pack(fmt, *values)
