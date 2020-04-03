@@ -48,6 +48,11 @@ class VESCMotor(object):
         if int(version.split('.')[0]) < 3:
             GetValues.fields = pre_v3_33_fields
 
+        # store message info for getting values so it doesn't need to calculate it every time
+        msg = GetValues()
+        self._get_values_msg = pyvesc.encode_request(msg)
+        self._get_values_msg_expected_length = msg._full_msg_size
+
     def __enter__(self):
         return self
 
@@ -110,7 +115,7 @@ class VESCMotor(object):
         self.serial_port.write(data)
         if num_read_bytes is not None:
             while self.serial_port.in_waiting <= num_read_bytes:
-                time.sleep(0.01)
+                time.sleep(0.000001)  # add some delay just to help the CPU
             response, consumed = pyvesc.decode(self.serial_port.read(self.serial_port.in_waiting))
             return response
 
@@ -152,8 +157,7 @@ class VESCMotor(object):
         """
         :return: A msg object with attributes containing the measurement values
         """
-        msg = GetValues()
-        return self.write(pyvesc.encode_request(msg), num_read_bytes=msg._full_msg_size)
+        return self.write(self._get_values_msg, num_read_bytes=self._get_values_msg_expected_length)
 
     def get_firmware_version(self):
         msg = GetVersion()
