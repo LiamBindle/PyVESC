@@ -1,7 +1,9 @@
 import collections
 import struct
 from pyvesc.packet.exceptions import *
-from PyCRC.CRCCCITT import CRCCCITT
+from crccheck.crc import CrcXmodem
+
+crc_checker = CrcXmodem()
 
 
 class Header(collections.namedtuple('Header', ['payload_index', 'payload_length'])):
@@ -60,7 +62,7 @@ class Footer(collections.namedtuple('Footer', ['crc', 'terminator'])):
 
     @staticmethod
     def generate(payload):
-        crc = CRCCCITT().calculate(payload)
+        crc = crc_checker.calc(payload)
         terminator = Footer.TERMINATOR
         return Footer(crc, terminator)
 

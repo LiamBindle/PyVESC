@@ -11,7 +11,7 @@ class VESCMessage(type):
     format character. For more info on struct format characters see: https://docs.python.org/2/library/struct.html
     """
     _msg_registry = {}
-    _endian_fmt = '>'
+    _endian_fmt = '!'
     _id_fmt = 'B'
     _can_id_fmt = 'BB'
     _comm_forward_can = 33
@@ -42,6 +42,7 @@ class VESCMessage(type):
                 cls._fmt_fields += '%u'
                 cls._string_field = idx
             cls._fmt_fields += field[1]
+        cls._full_msg_size = struct.calcsize(cls._fmt_fields)
         # check that at most 1 field is a string
         string_field_count = cls._fmt_fields.count('s')
         if string_field_count > 1:
@@ -53,9 +54,9 @@ class VESCMessage(type):
     def __call__(cls, *args, **kwargs):
         instance = super(VESCMessage, cls).__call__()
         if 'can_id' in kwargs:
-            cls.can_id = kwargs['can_id']
+            instance.can_id = kwargs['can_id']
         else:
-            cls.can_id = None
+            instance.can_id = None
         if args:
             if len(args) != len(cls.fields):
                 raise AttributeError("Expected %u arguments, received %u" % (len(cls.fields), len(args)))
@@ -83,9 +84,11 @@ class VESCMessage(type):
             data = list(struct.unpack_from(VESCMessage._endian_fmt + msg_type._fmt_fields, msg_bytes, 1))
             for k, field in enumerate(data):
                 try:
-                    data[k] = data[k]/msg_type._field_scalars[k]
+                    if msg_type._field_scalars[k] != 0:
+                        data[k] = data[k]/msg_type._field_scalars[k]
                 except (TypeError, IndexError) as e:
-                    pass
+                    print("Error ecountered on field " + msg_type.fields[k][0])
+                    print(e)
         msg = msg_type(*data)
         if not (msg_type._string_field is None):
             string_field_name = msg_type._field_names[msg_type._string_field]
@@ -95,7 +98,7 @@ class VESCMessage(type):
         return msg
 
     @staticmethod
-    def pack(instance, header_only = None):
+    def pack(instance, header_only=None):
         if header_only:
             if instance.can_id is not None:
                 fmt = VESCMessage._endian_fmt + VESCMessage._can_id_fmt + VESCMessage._id_fmt
