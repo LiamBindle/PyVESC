@@ -23,7 +23,7 @@ def run_motor_as_object():
     motor = VESCMotor(serial_port=serial_port)
     print("Firmware: ", motor.get_firmware_version())
 
-    # run motor and print out rpm for ~2 seconds
+    # sweep servo through full range
     for i in range(100):
         time.sleep(0.01)
         motor.set_servo(i/100)

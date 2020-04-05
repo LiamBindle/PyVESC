@@ -31,15 +31,6 @@ class VESCMotor(object):
         self.heart_beat_thread = threading.Thread(target=self._heartbeat_cmd_func)
         self._stop_heartbeat = threading.Event()
 
-        def pass_func(value, value2):
-            pass
-
-        self._pass_func = pass_func
-        self._func_lock = threading.Lock()
-        self._last_cmd_func = pass_func
-        self._value_lock = threading.Lock()
-        self._last_cmd_value = None
-
         if start_heartbeat:
             self.start_heartbeat()
 
@@ -59,26 +50,6 @@ class VESCMotor(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop_heartbeat()
 
-    @property
-    def last_cmd_func(self):
-        with self._func_lock:
-            return self._last_cmd_func
-
-    @last_cmd_func.setter
-    def last_cmd_func(self, new_func):
-        with self._func_lock:
-            self._last_cmd_func = new_func
-
-    @property
-    def last_cmd_value(self):
-        with self._value_lock:
-            return self._last_cmd_value
-
-    @last_cmd_value.setter
-    def last_cmd_value(self, new_value):
-        with self._value_lock:
-            self._last_cmd_value = new_value
-
     def _heartbeat_cmd_func(self):
         """
         Continuous function calling that keeps the motor alive
@@ -86,7 +57,6 @@ class VESCMotor(object):
         while not self._stop_heartbeat.isSet():
             time.sleep(0.1)
             self.write(alive_msg)
-            # self.last_cmd_func(self.last_cmd_value, True)
 
     def start_heartbeat(self):
         """
@@ -102,8 +72,6 @@ class VESCMotor(object):
         if self.heart_beat_thread.is_alive():
             self._stop_heartbeat.set()
             self.heart_beat_thread.join()
-        self.last_cmd_func = self._pass_func
-        self.last_cmd_value = None
 
     def write(self, data, num_read_bytes=None):
         """
