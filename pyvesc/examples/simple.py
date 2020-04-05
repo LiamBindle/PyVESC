@@ -1,5 +1,6 @@
 import pyvesc
 
+
 def simple_example():
     # lets make a SetDuty message
     my_msg = pyvesc.SetDutyCycle(1e5)

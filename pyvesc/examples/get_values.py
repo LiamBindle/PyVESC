@@ -1,10 +1,11 @@
 import pyvesc
-from pyvesc import GetValues, SetRPM, SetCurrent, SetRotorPositionMode, GetRotorPosition
+from pyvesc.VESCMotor.messages import GetValues, SetRPM, SetCurrent, SetRotorPositionMode, GetRotorPosition
 import serial
 import time
 
 # Set your serial port here (either /dev/ttyX or COMX)
 serialport = 'COM3'
+
 
 def get_values_example():
     with serial.Serial(serialport, baudrate=115200, timeout=0.05) as ser:
@@ -43,6 +44,7 @@ def get_values_example():
         except KeyboardInterrupt:
             # Turn Off the VESC
             ser.write(pyvesc.encode(SetCurrent(0)))
+
 
 if __name__ == "__main__":
     get_values_example()
