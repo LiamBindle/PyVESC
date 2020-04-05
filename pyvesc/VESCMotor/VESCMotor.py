@@ -1,5 +1,5 @@
-import pyvesc
-from pyvesc import *
+from pyvesc.protocol.interface import encode_request, encode, decode
+from pyvesc.VESCMotor.messages import *
 import time
 import threading
 
@@ -26,7 +26,7 @@ class VESCMotor(object):
 
         self.serial_port = serial.Serial(port=serial_port, baudrate=baudrate, timeout=timeout)
         if has_sensor:
-            self.serial_port.write(pyvesc.encode(SetRotorPositionMode(SetRotorPositionMode.DISP_POS_OFF)))
+            self.serial_port.write(encode(SetRotorPositionMode(SetRotorPositionMode.DISP_POS_OFF)))
 
         self.heart_beat_thread = threading.Thread(target=self._heartbeat_cmd_func)
         self._stop_heartbeat = threading.Event()
@@ -50,7 +50,7 @@ class VESCMotor(object):
 
         # store message info for getting values so it doesn't need to calculate it every time
         msg = GetValues()
-        self._get_values_msg = pyvesc.encode_request(msg)
+        self._get_values_msg = encode_request(msg)
         self._get_values_msg_expected_length = msg._full_msg_size
 
     def __enter__(self):
@@ -85,7 +85,8 @@ class VESCMotor(object):
         """
         while not self._stop_heartbeat.isSet():
             time.sleep(0.1)
-            self.last_cmd_func(self.last_cmd_value, True)
+            self.write(alive_msg)
+            # self.last_cmd_func(self.last_cmd_value, True)
 
     def start_heartbeat(self):
         """
@@ -116,42 +117,33 @@ class VESCMotor(object):
         if num_read_bytes is not None:
             while self.serial_port.in_waiting <= num_read_bytes:
                 time.sleep(0.000001)  # add some delay just to help the CPU
-            response, consumed = pyvesc.decode(self.serial_port.read(self.serial_port.in_waiting))
+            response, consumed = decode(self.serial_port.read(self.serial_port.in_waiting))
             return response
 
-    def set_rpm(self, new_rpm, _heart_beat_call=False):
+    def set_rpm(self, new_rpm):
         """
         Set the electronic RPM value (a.k.a. the RPM value of the stator)
         :param new_rpm: new rpm value
-        :param _heart_beat_call: whether or not this function is called from the heartbeat thread
-        :return: Nothing
         """
-        self.write(pyvesc.encode(SetRPM(new_rpm)))
-        if not _heart_beat_call:
-            self.last_cmd_func = self.set_rpm
-            self.last_cmd_value = new_rpm
+        self.write(encode(SetRPM(new_rpm)))
 
-    def set_current(self, new_current, _heart_beat_call=False):
+    def set_current(self, new_current):
         """
         :param new_current: new current in milli-amps for the motor
-        :param _heart_beat_call: whether or not this function is called from the heartbeat thread
-        :return: Nothing
         """
-        self.write(pyvesc.encode(SetCurrent(new_current)))
-        if not _heart_beat_call:
-            self.last_cmd_func = self.set_current
-            self.last_cmd_value = new_current
+        self.write(encode(SetCurrent(new_current)))
 
-    def set_duty_cycle(self, new_duty_cycle, _heart_beat_call=False):
+    def set_duty_cycle(self, new_duty_cycle):
         """
         :param new_duty_cycle: Value of duty cycle to be set (range [-1e5, 1e5]).
-        :param _heart_beat_call: whether or not this function is called from the heartbeat thread
-        :return: Nothing
         """
-        self.write(pyvesc.encode(SetDutyCycle(new_duty_cycle)))
-        if not _heart_beat_call:
-            self.last_cmd_func = self.set_duty_cycle
-            self.last_cmd_value = new_duty_cycle
+        self.write(encode(SetDutyCycle(new_duty_cycle)))
+
+    def set_servo(self, new_servo_pos):
+        """
+        :param new_servo_pos: New servo position. valid range [0, 1]
+        """
+        self.write(encode(SetServoPosition(new_servo_pos)))
 
     def get_measurements(self):
         """
@@ -161,7 +153,7 @@ class VESCMotor(object):
 
     def get_firmware_version(self):
         msg = GetVersion()
-        return str(self.write(pyvesc.encode_request(msg), num_read_bytes=msg._full_msg_size))
+        return str(self.write(encode_request(msg), num_read_bytes=msg._full_msg_size))
 
     ''' The following methods are just to make it simpler for the user if they only want one common value from a 
         given request. '''

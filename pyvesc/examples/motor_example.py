@@ -9,10 +9,10 @@ serial_port = '/dev/tty.usbmodem301'
 def run_motor_using_with():
     with VESCMotor(serial_port=serial_port) as motor:
         print("Firmware: ", motor.get_firmware_version())
-        motor.set_rpm(5000)
+        motor.set_rpm(300)
 
         # run motor and print out rpm for ~2 seconds
-        for i in range(20):
+        for i in range(30):
             time.sleep(0.1)
             print(motor.get_measurements().rpm)
         motor.set_rpm(0)
@@ -22,13 +22,11 @@ def run_motor_using_with():
 def run_motor_as_object():
     motor = VESCMotor(serial_port=serial_port)
     print("Firmware: ", motor.get_firmware_version())
-    motor.set_rpm(5000)
 
     # run motor and print out rpm for ~2 seconds
-    for _ in range(20):
-        time.sleep(0.1)
-        print(motor.get_measurements().rpm)
-    motor.set_rpm(0)
+    for i in range(100):
+        time.sleep(0.01)
+        motor.set_servo(i/100)
 
     # IMPORTANT: YOU MUST STOP THE HEARTBEAT IF IT IS RUNNING BEFORE IT GOES OUT OF SCOPE. Otherwise, it will not
     #            clean-up properly.

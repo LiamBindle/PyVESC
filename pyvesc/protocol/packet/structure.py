@@ -1,6 +1,6 @@
 import collections
 import struct
-from pyvesc.packet.exceptions import *
+from pyvesc.protocol.packet.exceptions import *
 from crccheck.crc import CrcXmodem
 
 crc_checker = CrcXmodem()

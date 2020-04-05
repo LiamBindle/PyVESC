@@ -1,4 +1,5 @@
-from pyvesc.messages.base import VESCMessage
+from pyvesc.protocol.base import VESCMessage
+from pyvesc.protocol.interface import encode
 
 
 class SetDutyCycle(metaclass=VESCMessage):
@@ -44,6 +45,7 @@ class SetCurrentBrake(metaclass=VESCMessage):
         ('current_brake', 'i')
     ]
 
+
 class SetPosition(metaclass=VESCMessage):
     """Set the rotor angle based off of an encoder or sensor
     
@@ -53,6 +55,7 @@ class SetPosition(metaclass=VESCMessage):
     fields = [
         ('pos', 'i', 1000000)
     ]
+
 
 class SetRotorPositionMode(metaclass=VESCMessage):
     """Sets the rotor position feedback mode.
@@ -75,3 +78,24 @@ class SetRotorPositionMode(metaclass=VESCMessage):
     fields = [
         ('pos_mode', 'b')
     ]
+
+
+class SetServoPosition(metaclass=VESCMessage):
+    """Sets the position of s servo connected to the VESC.
+
+    :ivar servo_pos: Value of position (range [0, 1])
+    """
+
+    id = 12
+    fields = [
+        ('servo_pos', 'h', 1000)
+    ]
+
+
+class Alive(metaclass=VESCMessage):
+    """Heartbeat signal to keep VESC alive"""
+    id = 30
+    fields = []
+
+
+alive_msg = encode(Alive())

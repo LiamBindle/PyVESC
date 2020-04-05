@@ -1,4 +1,4 @@
-from pyvesc.messages.base import VESCMessage
+from pyvesc.protocol.base import VESCMessage
 
 
 pre_v3_33_fields = [('temp_mos1', 'h', 10),

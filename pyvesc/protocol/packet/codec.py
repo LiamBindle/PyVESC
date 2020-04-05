@@ -1,5 +1,5 @@
-from pyvesc.packet.structure import *
-from pyvesc.packet.exceptions import *
+from .exceptions import *
+from .structure import *
 from crccheck.crc import CrcXmodem
 
 crc_checker = CrcXmodem()
