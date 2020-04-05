@@ -123,21 +123,34 @@ class VESCMotor(object):
         msg = GetVersion()
         return str(self.write(encode_request(msg), num_read_bytes=msg._full_msg_size))
 
-    ''' The following methods are just to make it simpler for the user if they only want one common value from a 
-        given request. '''
     def get_rpm(self):
+        """
+        :return: Current motor rpm
+        """
         return self.get_measurements().rpm
 
     def get_duty_cycle(self):
+        """
+        :return: Current applied duty-cycle
+        """
         return self.get_measurements().duty_now
 
     def get_v_in(self):
+        """
+        :return: Current input voltage
+        """
         return self.get_measurements().v_in
 
     def get_motor_current(self):
+        """
+        :return: Current motor current
+        """
         return self.get_measurements().current_motor
 
     def get_incoming_current(self):
+        """
+        :return: Current incoming current
+        """
         return self.get_measurements().current_in
 
 

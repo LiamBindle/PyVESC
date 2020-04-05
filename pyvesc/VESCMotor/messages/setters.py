@@ -98,4 +98,5 @@ class Alive(metaclass=VESCMessage):
     fields = []
 
 
+# statically save this message because it does not need to be recalculated
 alive_msg = encode(Alive())
