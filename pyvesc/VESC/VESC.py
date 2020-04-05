@@ -1,5 +1,5 @@
 from pyvesc.protocol.interface import encode_request, encode, decode
-from pyvesc.VESCMotor.messages import *
+from pyvesc.VESC.messages import *
 import time
 import threading
 
@@ -10,7 +10,7 @@ except ImportError:
     serial = None
 
 
-class VESCMotor(object):
+class VESC(object):
     def __init__(self, serial_port, has_sensor=False, start_heartbeat=True, baudrate=115200, timeout=0.05):
         """
         :param serial_port: Serial device to use for communication (i.e. "COM3" or "/dev/tty.usbmodem0")
