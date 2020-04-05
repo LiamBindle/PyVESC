@@ -4,7 +4,7 @@ VERSION = '1.0.5'
 
 setup(
   name='pyvesc',
-  packages=['pyvesc', 'pyvesc.protocol', 'pyvesc.protocol.packet', 'pyvesc.VESCMotor'],
+  packages=['pyvesc', 'pyvesc.protocol', 'pyvesc.protocol.packet', 'pyvesc.VESCMotor', 'pyvesc.VESCMotor.messages'],
   version=VERSION,
   description='Python implementation of the VESC communication protocol.',
   author='Liam Bindle',
