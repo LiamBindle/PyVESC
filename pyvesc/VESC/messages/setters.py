@@ -1,5 +1,6 @@
 from pyvesc.protocol.base import VESCMessage
 from pyvesc.protocol.interface import encode
+from pyvesc.VESC.messages import VedderCmd
 
 
 class SetDutyCycle(metaclass=VESCMessage):
@@ -7,7 +8,7 @@ class SetDutyCycle(metaclass=VESCMessage):
 
     :ivar duty_cycle: Value of duty cycle to be set (range [-1e5, 1e5]).
     """
-    id = 5
+    id = VedderCmd.COMM_SET_DUTY
     fields = [
         ('duty_cycle', 'i')
     ]
@@ -18,7 +19,7 @@ class SetRPM(metaclass=VESCMessage):
 
     :ivar rpm: Value to set the RPM to.
     """
-    id = 8
+    id = VedderCmd.COMM_SET_RPM
     fields = [
         ('rpm', 'i')
     ]
@@ -29,7 +30,7 @@ class SetCurrent(metaclass=VESCMessage):
 
     :ivar current: Value to set the current to (in milliamps).
     """
-    id = 6
+    id = VedderCmd.COMM_SET_CURRENT
     fields = [
         ('current', 'i')
     ]
@@ -40,7 +41,7 @@ class SetCurrentBrake(metaclass=VESCMessage):
 
     :ivar current_brake: Value to set the current brake to (in milliamps).
     """
-    id = 7
+    id = VedderCmd.COMM_SET_CURRENT_BRAKE
     fields = [
         ('current_brake', 'i')
     ]
@@ -51,33 +52,34 @@ class SetPosition(metaclass=VESCMessage):
     
     :ivar pos: Value to set the current position or angle to.
     """
-    id = 9
+    id = VedderCmd.COMM_SET_POS
     fields = [
         ('pos', 'i', 1000000)
     ]
 
 
-class SetRotorPositionMode(metaclass=VESCMessage):
-    """Sets the rotor position feedback mode.
-        
-    It is reccomended to use the defined modes as below:
-        * DISP_POS_OFF
-        * DISP_POS_MODE_ENCODER
-        * DISP_POS_MODE_PID_POS
-        * DISP_POS_MODE_PID_POS_ERROR
-    
-    :ivar pos_mode: Value of the mode
-    """
-
-    DISP_POS_OFF = 0
-    DISP_POS_MODE_ENCODER = 3
-    DISP_POS_MODE_PID_POS = 4
-    DISP_POS_MODE_PID_POS_ERROR = 5
-
-    id = 10
-    fields = [
-        ('pos_mode', 'b')
-    ]
+# This seems outdated and I'm not sure what id it is supposed to be
+# class SetRotorPositionMode(metaclass=VESCMessage):
+#     """Sets the rotor position feedback mode.
+#
+#     It is reccomended to use the defined modes as below:
+#         * DISP_POS_OFF
+#         * DISP_POS_MODE_ENCODER
+#         * DISP_POS_MODE_PID_POS
+#         * DISP_POS_MODE_PID_POS_ERROR
+#
+#     :ivar pos_mode: Value of the mode
+#     """
+#
+#     DISP_POS_OFF = 0
+#     DISP_POS_MODE_ENCODER = 3
+#     DISP_POS_MODE_PID_POS = 4
+#     DISP_POS_MODE_PID_POS_ERROR = 5
+#
+#     id = 10
+#     fields = [
+#         ('pos_mode', 'b')
+#     ]
 
 
 class SetServoPosition(metaclass=VESCMessage):
@@ -86,7 +88,7 @@ class SetServoPosition(metaclass=VESCMessage):
     :ivar servo_pos: Value of position (range [0, 1])
     """
 
-    id = 12
+    id = VedderCmd.COMM_SET_SERVO_POS
     fields = [
         ('servo_pos', 'h', 1000)
     ]
@@ -94,7 +96,7 @@ class SetServoPosition(metaclass=VESCMessage):
 
 class Alive(metaclass=VESCMessage):
     """Heartbeat signal to keep VESC alive"""
-    id = 30
+    id = VedderCmd.COMM_ALIVE
     fields = []
 
 

@@ -1,4 +1,5 @@
 from pyvesc.protocol.base import VESCMessage
+from pyvesc.VESC.messages import VedderCmd
 
 
 pre_v3_33_fields = [('temp_mos1', 'h', 10),
@@ -25,7 +26,7 @@ pre_v3_33_fields = [('temp_mos1', 'h', 10),
 class GetVersion(metaclass=VESCMessage):
     """ Gets version fields
     """
-    id = 0
+    id = VedderCmd.COMM_FW_VERSION
 
     fields = [
             ('comm_fw_version', 'b', 0),
@@ -40,7 +41,7 @@ class GetVersion(metaclass=VESCMessage):
 class GetValues(metaclass=VESCMessage):
     """ Gets internal sensor data
     """
-    id = 4
+    id = VedderCmd.COMM_GET_VALUES
 
     fields = [
         ('temp_fet', 'h', 10),
@@ -71,7 +72,7 @@ class GetRotorPosition(metaclass=VESCMessage):
     Must be set to DISP_POS_MODE_ENCODER or DISP_POS_MODE_PID_POS (Mode 3 or 
     Mode 4). This is set by SetRotorPositionMode (id=21).
     """
-    id = 21
+    id = VedderCmd.COMM_ROTOR_POSITION
 
     fields = [
             ('rotor_pos', 'i', 100000)
