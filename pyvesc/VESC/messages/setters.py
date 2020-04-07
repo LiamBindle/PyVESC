@@ -10,7 +10,7 @@ class SetDutyCycle(metaclass=VESCMessage):
     """
     id = VedderCmd.COMM_SET_DUTY
     fields = [
-        ('duty_cycle', 'i')
+        ('duty_cycle', 'i', 100000)
     ]
 
 
@@ -32,7 +32,7 @@ class SetCurrent(metaclass=VESCMessage):
     """
     id = VedderCmd.COMM_SET_CURRENT
     fields = [
-        ('current', 'i')
+        ('current', 'i', 1000)
     ]
 
 
@@ -43,7 +43,7 @@ class SetCurrentBrake(metaclass=VESCMessage):
     """
     id = VedderCmd.COMM_SET_CURRENT_BRAKE
     fields = [
-        ('current_brake', 'i')
+        ('current_brake', 'i', 1000)
     ]
 
 
