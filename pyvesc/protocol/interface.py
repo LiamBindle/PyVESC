@@ -1,5 +1,5 @@
-import pyvesc.messages.base
-import pyvesc.packet.codec
+import pyvesc.protocol.base
+import pyvesc.protocol.packet.codec
 
 
 def decode(buffer):
@@ -13,9 +13,9 @@ def decode(buffer):
              was parsed returns (None, 0).
     :rtype: `tuple`: (PyVESC message, int)
     """
-    msg_payload, consumed = pyvesc.packet.codec.unframe(buffer)
+    msg_payload, consumed = pyvesc.protocol.packet.codec.unframe(buffer)
     if msg_payload:
-        return pyvesc.messages.base.VESCMessage.unpack(msg_payload), consumed
+        return pyvesc.protocol.base.VESCMessage.unpack(msg_payload), consumed
     else:
         return None, consumed
 
@@ -31,8 +31,8 @@ def encode(msg):
     :return: The packet.
     :rtype: bytes
     """
-    msg_payload = pyvesc.messages.base.VESCMessage.pack(msg)
-    packet = pyvesc.packet.codec.frame(msg_payload)
+    msg_payload = pyvesc.protocol.base.VESCMessage.pack(msg)
+    packet = pyvesc.protocol.packet.codec.frame(msg_payload)
     return packet
 
 
@@ -48,6 +48,6 @@ def encode_request(msg_cls):
     :return: The encoded PyVESC message which can be sent.
     :rtype: bytes
     """
-    msg_payload = pyvesc.messages.base.VESCMessage.pack(msg_cls, header_only=True)
-    packet = pyvesc.packet.codec.frame(msg_payload)
+    msg_payload = pyvesc.protocol.base.VESCMessage.pack(msg_cls, header_only=True)
+    packet = pyvesc.protocol.packet.codec.frame(msg_payload)
     return packet

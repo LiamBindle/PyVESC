@@ -9,7 +9,7 @@ class TestPacket(TestCase):
         :param length: Number of bytes in payload.
         """
         import random
-        import pyvesc.packet.codec as vesc_packet
+        import pyvesc.protocol.packet.codec as vesc_packet
         correct_payload_index = None
         if length < 256:
             correct_payload_index = 2
@@ -34,7 +34,7 @@ class TestPacket(TestCase):
         :param length2: Length of second payload
         """
         import random
-        import pyvesc.packet.codec as vesc_packet
+        import pyvesc.protocol.packet.codec as vesc_packet
         correct_payload_index1 = None
         correct_payload_index2 = None
         if length1 < 256:
@@ -65,7 +65,7 @@ class TestPacket(TestCase):
 
     def parse_buffer(self, length):
         import random
-        import pyvesc.packet.codec as vesc_packet
+        import pyvesc.protocol.packet.codec as vesc_packet
         correct_payload_index = None
         if length < 256:
             correct_payload_index = 2
@@ -117,7 +117,7 @@ class TestPacket(TestCase):
             self.parse_buffer(length)
 
     def test_corrupt_detection(self):
-        import pyvesc.packet.codec as vesc_packet
+        import pyvesc.protocol.packet.codec as vesc_packet
         # make a good packet
         test_payload = b'Te!'
         good_packet = b'\x02\x03Te!B\x92\x03'
@@ -159,7 +159,7 @@ class TestPacket(TestCase):
         self.assertEqual(out_buffer, b'')
 
     def test_corrupt_recovery(self):
-        import pyvesc.packet.codec as vesc_packet
+        import pyvesc.protocol.packet.codec as vesc_packet
         # make a good packet
         test_payload = b'Te!'
         good_packet = b'\x02\x03Te!B\x92\x03'
@@ -205,16 +205,16 @@ class TestPacket(TestCase):
 class TestMsg(TestCase):
     def setUp(self):
         import copy
-        from pyvesc.messages.base import VESCMessage
+        from pyvesc.protocol.base import VESCMessage
         self._initial_registry = copy.deepcopy(VESCMessage._msg_registry)
 
     def tearDown(self):
-        from pyvesc.messages.base import VESCMessage
+        from pyvesc.protocol.base import VESCMessage
         VESCMessage._msg_registry = self._initial_registry
         self._initial_registry = None
 
     def verify_packing_and_unpacking(self, msg):
-        from pyvesc.messages.base import VESCMessage
+        from pyvesc.protocol.base import VESCMessage
         payload_bytestring = VESCMessage.pack(msg)
         parsed_msg = VESCMessage.unpack(payload_bytestring)
         self.assertEqual(parsed_msg.id, msg.id)
@@ -222,7 +222,7 @@ class TestMsg(TestCase):
             self.assertEqual(getattr(parsed_msg, name), getattr(msg, name))
 
     def test_single_message(self):
-        from pyvesc.messages.base import VESCMessage
+        from pyvesc.protocol.base import VESCMessage
 
         class TestMsg1(metaclass=VESCMessage):
             id = 0x12
@@ -239,7 +239,7 @@ class TestMsg(TestCase):
         self.verify_packing_and_unpacking(test_message)
 
     def test_multiple_messages(self):
-        from pyvesc.messages.base import VESCMessage
+        from pyvesc.protocol.base import VESCMessage
 
         class testMsg1(metaclass=VESCMessage):
             id = 0x45
@@ -289,7 +289,7 @@ class TestMsg(TestCase):
         self.verify_packing_and_unpacking(test_message4)
 
     def test_errors(self):
-        from pyvesc.messages.base import VESCMessage
+        from pyvesc.protocol.base import VESCMessage
 
         # try to make two messages with the same ID
         class testMsg1(metaclass=VESCMessage):
@@ -360,11 +360,11 @@ class TestMsg(TestCase):
 class TestInterface(TestCase):
     def setUp(self):
         import copy
-        from pyvesc.messages.base import VESCMessage
+        from pyvesc.protocol.base import VESCMessage
         self._initial_registry = copy.deepcopy(VESCMessage._msg_registry)
 
     def tearDown(self):
-        from pyvesc.messages.base import VESCMessage
+        from pyvesc.protocol.base import VESCMessage
         VESCMessage._msg_registry = self._initial_registry
         self._initial_registry = None
 
@@ -377,8 +377,7 @@ class TestInterface(TestCase):
             self.assertEqual(getattr(msg, field), getattr(decoded, field))
 
     def test_interface(self):
-        from pyvesc import encode, decode
-        from pyvesc.messages import VESCMessage
+        from pyvesc.VESCMotor.messages import VESCMessage
 
         class testMsg1(metaclass=VESCMessage):
             id = 0x45
