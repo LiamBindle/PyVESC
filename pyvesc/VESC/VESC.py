@@ -49,6 +49,9 @@ class VESC(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop_heartbeat()
+        if self.serial_port.is_open:
+            self.serial_port.flush()
+            self.serial_port.close()
 
     def _heartbeat_cmd_func(self):
         """
