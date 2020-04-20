@@ -18,6 +18,7 @@ class VESCMessage(type):
     _entry_msg_registry = None
 
     def __init__(cls, name, bases, clsdict):
+        cls.can_id = None
         msg_id = clsdict['id']
         # make sure that message classes are final
         for klass in bases:
