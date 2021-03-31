@@ -1,5 +1,5 @@
 import pyvesc
-from pyvesc.VESCMotor.messages import GetValues, SetRPM, SetCurrent, SetRotorPositionMode, GetRotorPosition
+from pyvesc.VESC.messages import GetValues, SetRPM, SetCurrent, SetRotorPositionMode, GetRotorPosition
 import serial
 import time
 
@@ -11,7 +11,7 @@ def get_values_example():
     with serial.Serial(serialport, baudrate=115200, timeout=0.05) as ser:
         try:
             # Optional: Turn on rotor position reading if an encoder is installed
-            ser.write(pyvesc.encode(SetRotorPositionMode(SetRotorPositionMode.DISP_POS_OFF)))
+            ser.write(pyvesc.encode(SetRotorPositionMode(SetRotorPositionMode.DISP_POS_MODE_ENCODER)))
             while True:
                 # Set the ERPM of the VESC motor
                 #    Note: if you want to set the real RPM you can set a scalar
