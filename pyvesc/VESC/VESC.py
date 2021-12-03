@@ -1,3 +1,4 @@
+from typing import Any, Dict, List
 from pyvesc.protocol.interface import encode_request, encode, decode
 from pyvesc.VESC.messages import *
 import time
@@ -7,26 +8,47 @@ import threading
 try:
     import serial
 except ImportError:
-    serial = None
+    serial = None    
 
 
-class VESC(object):
-    def __init__(self, serial_port, has_sensor=False, start_heartbeat=True, baudrate=115200, timeout=0.05):
+class MultiVESC:
+    def __init__(self, serial_port, vescs_params: List[Dict[str, Any]], baudrate=115200, timeout=0.05) -> None:
         """
         :param serial_port: Serial device to use for communication (i.e. "COM3" or "/dev/tty.usbmodem0")
-        :param has_sensor: Whether or not the bldc motor is using a hall effect sensor
-        :param start_heartbeat: Whether or not to automatically start the heartbeat thread that will keep commands
-                                alive.
+        :param vescs_params: List of params dict for individual VESC controller (eg. can_id, has_sensor, etc.)
         :param baudrate: baudrate for the serial communication. Shouldn't need to change this.
         :param timeout: timeout for the serial communication
         """
 
-        if serial is None:
-            raise ImportError("Need to install pyserial in order to use the VESCMotor class.")
-
         self.serial_port = serial.Serial(port=serial_port, baudrate=baudrate, timeout=timeout)
+        self.serial_lock = threading.Lock()
+
+        self.controllers = [
+            VESC(
+                shared_serial_port=self.serial_port,
+                shared_serial_lock=self.serial_lock,
+                **params
+            )
+            for params in vescs_params
+        ]
+
+
+class VESC(object):
+    def __init__(self, shared_serial_port, shared_serial_lock, can_id=None, has_sensor=False, start_heartbeat=True):
+        """
+        :param serial_port: Serial device to use for communication (i.e. "COM3" or "/dev/tty.usbmodem0")
+        :param can_id: CAN ID if use CAN retransmission
+        :param has_sensor: Whether or not the bldc motor is using a hall effect sensor
+        :param start_heartbeat: Whether or not to automatically start the heartbeat thread that will keep commands
+                                alive.
+        """
+        self.can_id = can_id
+
+        self.serial_port = shared_serial_port
+        self.serial_lock = shared_serial_lock
+
         if has_sensor:
-            self.serial_port.write(encode(SetRotorPositionMode(SetRotorPositionMode.DISP_POS_OFF)))
+            self.serial_port.write(encode(SetRotorPositionMode(SetRotorPositionMode.DISP_POS_OFF, can_id=self.can_id)))
 
         self.heart_beat_thread = threading.Thread(target=self._heartbeat_cmd_func)
         self._stop_heartbeat = threading.Event()
@@ -34,13 +56,8 @@ class VESC(object):
         if start_heartbeat:
             self.start_heartbeat()
 
-        # check firmware version and set GetValue fields to old values if pre version 3.xx
-        version = self.get_firmware_version()
-        if int(version.split('.')[0]) < 3:
-            GetValues.fields = pre_v3_33_fields
-
         # store message info for getting values so it doesn't need to calculate it every time
-        msg = GetValues()
+        msg = GetValues(can_id=self.can_id)
         self._get_values_msg = encode_request(msg)
         self._get_values_msg_expected_length = msg._full_msg_size
 
@@ -59,7 +76,7 @@ class VESC(object):
         """
         while not self._stop_heartbeat.isSet():
             time.sleep(0.1)
-            self.write(alive_msg)
+            self.write(encode(Alive(can_id=self.can_id)))
 
     def start_heartbeat(self):
         """
@@ -84,37 +101,38 @@ class VESC(object):
         :param num_read_bytes: number of bytes to read for decoding response
         :return: decoded response from buffer
         """
-        self.serial_port.write(data)
-        if num_read_bytes is not None:
-            while self.serial_port.in_waiting <= num_read_bytes:
-                time.sleep(0.000001)  # add some delay just to help the CPU
-            response, consumed = decode(self.serial_port.read(self.serial_port.in_waiting))
-            return response
+        with self.serial_lock:
+            self.serial_port.write(data)
+            if num_read_bytes is not None:
+                while self.serial_port.in_waiting <= num_read_bytes:
+                    time.sleep(0.000001)  # add some delay just to help the CPU
+                response, consumed = decode(self.serial_port.read(self.serial_port.in_waiting))
+                return response
 
     def set_rpm(self, new_rpm):
         """
         Set the electronic RPM value (a.k.a. the RPM value of the stator)
         :param new_rpm: new rpm value
         """
-        self.write(encode(SetRPM(new_rpm)))
+        self.write(encode(SetRPM(new_rpm, can_id=self.can_id)))
 
     def set_current(self, new_current):
         """
         :param new_current: new current in milli-amps for the motor
         """
-        self.write(encode(SetCurrent(new_current)))
+        self.write(encode(SetCurrent(new_current, can_id=self.can_id)))
 
     def set_duty_cycle(self, new_duty_cycle):
         """
         :param new_duty_cycle: Value of duty cycle to be set (range [-1e5, 1e5]).
         """
-        self.write(encode(SetDutyCycle(new_duty_cycle)))
+        self.write(encode(SetDutyCycle(new_duty_cycle, can_id=self.can_id)))
 
     def set_servo(self, new_servo_pos):
         """
         :param new_servo_pos: New servo position. valid range [0, 1]
         """
-        self.write(encode(SetServoPosition(new_servo_pos)))
+        self.write(encode(SetServoPosition(new_servo_pos, can_id=self.can_id)))
 
     def get_measurements(self):
         """
@@ -123,7 +141,7 @@ class VESC(object):
         return self.write(self._get_values_msg, num_read_bytes=self._get_values_msg_expected_length)
 
     def get_firmware_version(self):
-        msg = GetVersion()
+        msg = GetVersion(can_id=self.can_id)
         return str(self.write(encode_request(msg), num_read_bytes=msg._full_msg_size))
 
     def get_rpm(self):

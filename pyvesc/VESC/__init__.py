@@ -1,1 +1,1 @@
-from .VESC import VESC
+from .VESC import VESC, MultiVESC
