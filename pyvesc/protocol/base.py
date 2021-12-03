@@ -14,7 +14,7 @@ class VESCMessage(type):
     _endian_fmt = '!'
     _id_fmt = 'B'
     _can_id_fmt = 'BB'
-    _comm_forward_can = 33
+    _comm_forward_can = 34
     _entry_msg_registry = None
 
     def __init__(cls, name, bases, clsdict):
