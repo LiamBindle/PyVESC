@@ -32,3 +32,17 @@ critiques or changes just let me know or submit a pull request.
 ## License
 Just like VESC, PyVESC is distributed under a
 [Creative Commons ShareALike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0/).
+
+## Install
+<!-- pip install pyvesc -->
+```
+python setup.py install
+```
+If needed:
+```
+pip install pyserial
+pip install pythoncrc
+pip install pygame
+pip install numpy
+
+```

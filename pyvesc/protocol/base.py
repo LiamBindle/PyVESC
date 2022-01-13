@@ -38,7 +38,7 @@ class VESCMessage(type):
             cls._field_names.append(field[0])
             if len(field) >= 3:
                 cls._field_scalars.append(field[2])
-            if field[1] is 's':
+            if field[1] == 's':
                 # string field, add % so we can vary the length
                 cls._fmt_fields += '%u'
                 cls._string_field = idx

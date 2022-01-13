@@ -42,9 +42,9 @@ class Header(collections.namedtuple('Header', ['payload_index', 'payload_length'
         :param start_byte: The first byte in the buffer.
         :return: The character format of the packet header.
         """
-        if start_byte is 0x2:
+        if start_byte == 0x2:
             return '>BB'
-        elif start_byte is 0x3:
+        elif start_byte == 0x3:
             return '>BH'
         else:
             raise CorruptPacket("Invalid start byte: %u" % start_byte)
