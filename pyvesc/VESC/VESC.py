@@ -8,7 +8,7 @@ import threading
 try:
     import serial
 except ImportError:
-    serial = None    
+    serial = None
 
 
 class MultiVESC:
@@ -104,9 +104,7 @@ class VESC(object):
         with self.serial_lock:
             self.serial_port.write(data)
             if num_read_bytes is not None:
-                while self.serial_port.in_waiting <= num_read_bytes:
-                    time.sleep(0.000001)  # add some delay just to help the CPU
-                response, consumed = decode(self.serial_port.read(self.serial_port.in_waiting))
+                response, consumed = decode(self.serial_port.read(num_read_bytes))
                 return response
 
     def set_rpm(self, new_rpm):
@@ -173,7 +171,3 @@ class VESC(object):
         :return: Current incoming current
         """
         return self.get_measurements().current_in
-
-
-
-
