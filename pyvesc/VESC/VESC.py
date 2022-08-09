@@ -12,7 +12,7 @@ except ImportError:
 
 
 class MultiVESC:
-    def __init__(self, serial_port, vescs_params: List[Dict[str, Any]], baudrate=115200, timeout=0.05) -> None:
+    def __init__(self, serial_port, vescs_params: List[Dict[str, Any]], baudrate=115200, timeout=5) -> None:
         """
         :param serial_port: Serial device to use for communication (i.e. "COM3" or "/dev/tty.usbmodem0")
         :param vescs_params: List of params dict for individual VESC controller (eg. can_id, has_sensor, etc.)
@@ -104,9 +104,19 @@ class VESC(object):
         with self.serial_lock:
             self.serial_port.write(data)
             if num_read_bytes is not None:
-                while self.serial_port.in_waiting <= num_read_bytes:
-                    time.sleep(0.000001)  # add some delay just to help the CPU
-                response, consumed = decode(self.serial_port.read(self.serial_port.in_waiting))
+                import logging
+                # logging.getLogger().warning(f'WTF {num_read_bytes}')
+
+                response, consumed = decode(self.serial_port.read(num_read_bytes + 6))
+                # logging.getLogger().warning(f'WTF {self.serial_port.in_waiting}')
+                # self.serial_port.read(self.serial_port.in_waiting)
+
+                # t0 = time.time()
+                # while self.serial_port.in_waiting <= num_read_bytes:
+                #     time.sleep(0.000001)  # add some delay just to help the CPU
+                # t1 = time.time()
+                # logging.getLogger().warning(f'UIUIU {t1 - t0} {self.serial_port.in_waiting}')
+                # response, consumed = decode(self.serial_port.read(self.serial_port.in_waiting))
                 return response
 
     def set_rpm(self, new_rpm):
