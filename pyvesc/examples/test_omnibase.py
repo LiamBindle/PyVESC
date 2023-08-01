@@ -209,9 +209,9 @@ if __name__ == "__main__":
             description="Example of usage: python3 test_omnibase.py --serial_port /dev/vesc_wheels --right_wheel_id 72 --back_wheel_id 116"
         )
         parser.add_argument("--serial_port", type=str, default="/dev/vesc_wheels", help="serial port")
-        # parser.add_argument("--left_wheel_id", type=int, default=24, help="left wheel id")
-        parser.add_argument("--right_wheel_id", type=int, default=72, help="right wheel id")
-        parser.add_argument("--back_wheel_id", type=int, default=116, help="back wheel id")
+        parser.add_argument("--left_wheel_id", type=int, default=None, help="left wheel id")
+        parser.add_argument("--right_wheel_id", type=int, default=None, help="right wheel id")
+        parser.add_argument("--back_wheel_id", type=int, default=None, help="back wheel id")
         args = parser.parse_args()
 
         # local is 72 on reachy V2!!!!...
@@ -219,7 +219,7 @@ if __name__ == "__main__":
         # Attention! The VESC connected to the USB HAS to be declared as None here or wierd stuff happens...
         mobile_base = MobileBase(
             serial_port=args.serial_port,
-            left_wheel_id=None,
+            left_wheel_id=args.left_wheel_id,
             right_wheel_id=args.right_wheel_id,
             back_wheel_id=args.back_wheel_id,
         )
