@@ -217,12 +217,15 @@ if __name__ == "__main__":
         # local is 72 on reachy V2!!!!...
 
         # Attention! The VESC connected to the USB HAS to be declared as None here or wierd stuff happens...
+        print("Make sure you plugged a controller!")
+        print("Creating MobileBase instance...")
         mobile_base = MobileBase(
             serial_port=args.serial_port,
             left_wheel_id=args.left_wheel_id,
             right_wheel_id=args.right_wheel_id,
             back_wheel_id=args.back_wheel_id,
         )
+        print("MobileBase instance created.")
         # self.omnibase = MobileBase(left_wheel_id=None, right_wheel_id=72, back_wheel_id=116)
 
         # pygame.init()
@@ -250,6 +253,7 @@ if __name__ == "__main__":
     except Exception as e:
         traceback.print_exc()
     finally:
+        print("reached finally block")
         mobile_base.back_wheel.set_duty_cycle(0.0)
         mobile_base.left_wheel.set_duty_cycle(0.0)
         mobile_base.right_wheel.set_duty_cycle(0.0)
