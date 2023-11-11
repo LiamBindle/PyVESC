@@ -28,9 +28,9 @@ class VESC(object):
         if has_sensor:
             self.serial_port.write(encode(SetRotorPositionMode(SetRotorPositionMode.DISP_POS_OFF)))
 
-        self.heart_beat_thread = {
-            None: threading.Thread(target=self._heartbeat_cmd_func)
-        }
+        self.alive_msg = [encode(Alive())]
+
+        self.heart_beat_thread = threading.Thread(target=self._heartbeat_cmd_func)
         self._stop_heartbeat = threading.Event()
 
         if start_heartbeat:
@@ -55,36 +55,35 @@ class VESC(object):
             self.serial_port.flush()
             self.serial_port.close()
 
-    def _heartbeat_cmd_func(self, alive_msg):
+    def _heartbeat_cmd_func(self):
         """
         Continuous function calling that keeps the motor alive
         """
         while not self._stop_heartbeat.is_set():
             time.sleep(0.1)
-            self.write(alive_msg)
+            for i in self.alive_msg:
+                self.write(i)
 
     def start_heartbeat(self, can_id=None):
         """
         Starts a repetitive calling of the last set cmd to keep the motor alive.
 
         Args:
-            can_id: Optional, used to specify the CAN ID to start the heartbeat
+            can_id: Optional, used to specify the CAN ID to add to the existing heartbeat messaged
         """
-        if can_id not in self.heart_beat_thread:
-            self.heart_beat_thread[can_id] = threading.Thread(target=self._heartbeat_cmd_func, args=(encode(Alive(can_id=can_id)), ))
-        self.heart_beat_thread[can_id].start()
+        if can_id is not None:
+            self.alive_msg.append(encode(Alive(can_id=can_id)))
+        else:
+            self.heart_beat_thread.start()
 
     def stop_heartbeat(self):
         """
         Stops the heartbeat thread and resets the last cmd function. THIS MUST BE CALLED BEFORE THE OBJECT GOES OUT OF
         SCOPE UNLESS WRAPPING IN A WITH STATEMENT (Assuming the heartbeat was started).
-
-        This stops all heartbeat threads if multiple are called
         """
         self._stop_heartbeat.set()
-        for can_id in self.heart_beat_thread:
-            if self.heart_beat_thread[can_id].is_alive():
-                self.heart_beat_thread[can_id].join()
+        if self.heart_beat_thread.is_alive():
+            self.heart_beat_thread.join()
 
     def write(self, data, num_read_bytes=None):
         """
