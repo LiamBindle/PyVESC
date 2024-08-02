@@ -1,0 +1,14 @@
+from enum import Enum
+
+
+class VESC_FMT(Enum):
+    VESC_TX_UNDEFINED = 0
+    VESC_TX_UINT8 = 1
+    VESC_TX_INT8 = 2
+    VESC_TX_UINT16 = 3
+    VESC_TX_INT16 = 4
+    VESC_TX_UINT32 = 5
+    VESC_TX_INT32 = 6
+    VESC_TX_DOUBLE16 = 7
+    VESC_TX_DOUBLE32 = 8
+    VESC_TX_DOUBLE32_AUTO = 9

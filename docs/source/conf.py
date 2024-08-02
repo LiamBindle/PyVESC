@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# flake8: noqa
 # -*- coding: utf-8 -*-
 #
 # PyVESC documentation build configuration file, created by

@@ -22,6 +22,5 @@ def simple_example():
     print("Success!")
 
 
-
 if __name__ == "__main__":
     simple_example()

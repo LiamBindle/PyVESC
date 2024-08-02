@@ -1,5 +1,5 @@
-from pyvesc.protocol.base import VESCMessage
-from pyvesc.VESC.messages import VedderCmd
+from ..protocol.base import VESCMessage
+from .Vedder_BLDC_Commands import VedderCmd
 
 
 pre_v3_33_fields = [('temp_mos1', 'h', 10),
@@ -8,15 +8,15 @@ pre_v3_33_fields = [('temp_mos1', 'h', 10),
                     ('temp_mos4', 'h', 10),
                     ('temp_mos5', 'h', 10),
                     ('temp_mos6', 'h', 10),
-                    ('temp_pcb',  'h', 10),
+                    ('temp_pcb', 'h', 10),
                     ('current_motor', 'i', 100),
-                    ('current_in',  'i', 100),
-                    ('duty_now',    'h', 1000),
-                    ('rpm',         'i', 1),
-                    ('v_in',        'h', 10),
-                    ('amp_hours',   'i', 10000),
+                    ('current_in', 'i', 100),
+                    ('duty_now', 'h', 1000),
+                    ('rpm', 'i', 1),
+                    ('v_in', 'h', 10),
+                    ('amp_hours', 'i', 10000),
                     ('amp_hours_charged', 'i', 10000),
-                    ('watt_hours',  'i', 10000),
+                    ('watt_hours', 'i', 10000),
                     ('watt_hours_charged', 'i', 10000),
                     ('tachometer', 'i', 1),
                     ('tachometer_abs', 'i', 1),
@@ -28,14 +28,40 @@ class GetVersion(metaclass=VESCMessage):
     """
     id = VedderCmd.COMM_FW_VERSION
 
-    fields = [
-            ('comm_fw_version', 'b', 0),
-            ('fw_version_major', 'b', 0),
-            ('fw_version_minor', 'b', 0)
+    recv_fields = [
+        ('comm_fw_version', 'b', 0),
+        ('fw_version_major', 'b', 0),
+        ('fw_version_minor', 'b', 0)
     ]
 
     def __str__(self):
         return f"{self.comm_fw_version}.{self.fw_version_major}.{self.fw_version_minor}"
+
+
+class GetMotorConfig(metaclass=VESCMessage):
+    """
+    Get the motor configuration values
+
+    Receives a bytestring, so scalar is set to -1 to represent this
+    """
+    id = VedderCmd.COMM_GET_MCCONF
+
+    recv_fields = [
+        ('mcconf', 's', -1)
+    ]
+
+
+class GetAppConfig(metaclass=VESCMessage):
+    """
+    Get the app configuration values
+
+    Receives a bytestring, so scalar is set to -1 to represent this
+    """
+    id = VedderCmd.COMM_GET_APPCONF
+
+    recv_fields = [
+        ('appconf', 's', -1)
+    ]
 
 
 class GetValues(metaclass=VESCMessage):
@@ -43,7 +69,7 @@ class GetValues(metaclass=VESCMessage):
     """
     id = VedderCmd.COMM_GET_VALUES
 
-    fields = [
+    recv_fields = [
         ('temp_fet', 'h', 10),
         ('temp_motor', 'h', 10),
         ('avg_motor_current', 'i', 100),
@@ -68,12 +94,12 @@ class GetValues(metaclass=VESCMessage):
 
 class GetRotorPosition(metaclass=VESCMessage):
     """ Gets rotor position data
-    
-    Must be set to DISP_POS_MODE_ENCODER or DISP_POS_MODE_PID_POS (Mode 3 or 
+
+    Must be set to DISP_POS_MODE_ENCODER or DISP_POS_MODE_PID_POS (Mode 3 or
     Mode 4). This is set by SetRotorPositionMode (id=21).
     """
     id = VedderCmd.COMM_ROTOR_POSITION
 
-    fields = [
-            ('rotor_pos', 'i', 100000)
+    recv_fields = [
+        ('rotor_pos', 'i', 100000)
     ]
