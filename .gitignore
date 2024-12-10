@@ -6,3 +6,4 @@ MANIFEST
 dist/
 pyvesc.egg-info/
 build/
+unit_test_report.xml
