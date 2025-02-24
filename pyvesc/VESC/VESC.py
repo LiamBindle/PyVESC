@@ -28,6 +28,8 @@ class VESC(object):
         if has_sensor:
             self.serial_port.write(encode(SetRotorPositionMode(SetRotorPositionMode.DISP_POS_OFF)))
 
+        self.alive_msg = [encode(Alive())]
+
         self.heart_beat_thread = threading.Thread(target=self._heartbeat_cmd_func)
         self._stop_heartbeat = threading.Event()
 
@@ -57,23 +59,30 @@ class VESC(object):
         """
         Continuous function calling that keeps the motor alive
         """
-        while not self._stop_heartbeat.isSet():
+        while not self._stop_heartbeat.is_set():
             time.sleep(0.1)
-            self.write(alive_msg)
+            for i in self.alive_msg:
+                self.write(i)
 
-    def start_heartbeat(self):
+    def start_heartbeat(self, can_id=None):
         """
         Starts a repetitive calling of the last set cmd to keep the motor alive.
+
+        Args:
+            can_id: Optional, used to specify the CAN ID to add to the existing heartbeat messaged
         """
-        self.heart_beat_thread.start()
+        if can_id is not None:
+            self.alive_msg.append(encode(Alive(can_id=can_id)))
+        else:
+            self.heart_beat_thread.start()
 
     def stop_heartbeat(self):
         """
         Stops the heartbeat thread and resets the last cmd function. THIS MUST BE CALLED BEFORE THE OBJECT GOES OUT OF
         SCOPE UNLESS WRAPPING IN A WITH STATEMENT (Assuming the heartbeat was started).
         """
+        self._stop_heartbeat.set()
         if self.heart_beat_thread.is_alive():
-            self._stop_heartbeat.set()
             self.heart_beat_thread.join()
 
     def write(self, data, num_read_bytes=None):
@@ -91,30 +100,30 @@ class VESC(object):
             response, consumed = decode(self.serial_port.read(self.serial_port.in_waiting))
             return response
 
-    def set_rpm(self, new_rpm):
+    def set_rpm(self, new_rpm, **kwargs):
         """
         Set the electronic RPM value (a.k.a. the RPM value of the stator)
         :param new_rpm: new rpm value
         """
-        self.write(encode(SetRPM(new_rpm)))
+        self.write(encode(SetRPM(new_rpm, **kwargs)))
 
-    def set_current(self, new_current):
+    def set_current(self, new_current, **kwargs):
         """
         :param new_current: new current in milli-amps for the motor
         """
-        self.write(encode(SetCurrent(new_current)))
+        self.write(encode(SetCurrent(new_current, **kwargs)))
 
-    def set_duty_cycle(self, new_duty_cycle):
+    def set_duty_cycle(self, new_duty_cycle, **kwargs):
         """
         :param new_duty_cycle: Value of duty cycle to be set (range [-1e5, 1e5]).
         """
-        self.write(encode(SetDutyCycle(new_duty_cycle)))
+        self.write(encode(SetDutyCycle(new_duty_cycle, **kwargs)))
 
-    def set_servo(self, new_servo_pos):
+    def set_servo(self, new_servo_pos, **kwargs):
         """
         :param new_servo_pos: New servo position. valid range [0, 1]
         """
-        self.write(encode(SetServoPosition(new_servo_pos)))
+        self.write(encode(SetServoPosition(new_servo_pos, **kwargs)))
 
     def get_measurements(self):
         """

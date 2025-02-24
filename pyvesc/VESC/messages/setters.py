@@ -49,7 +49,7 @@ class SetCurrentBrake(metaclass=VESCMessage):
 
 class SetPosition(metaclass=VESCMessage):
     """Set the rotor angle based off of an encoder or sensor
-    
+
     :ivar pos: Value to set the current position or angle to.
     """
     id = VedderCmd.COMM_SET_POS
@@ -98,6 +98,3 @@ class Alive(metaclass=VESCMessage):
     id = VedderCmd.COMM_ALIVE
     fields = []
 
-
-# statically save this message because it does not need to be recalculated
-alive_msg = encode(Alive())
